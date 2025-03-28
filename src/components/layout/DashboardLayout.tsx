@@ -10,7 +10,7 @@ import {
   Settings, 
   LogOut,
   User,
-  Tool,
+  Wrench,
   ShoppingBag,
   LucideIcon
 } from 'lucide-react';
@@ -52,7 +52,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { to: '/dashboard', icon: BarChart3, label: 'Dashboard' },
     { to: '/rooms', icon: BedDouble, label: 'Rooms' },
     { to: '/tasks', icon: ClipboardList, label: 'Tasks' },
-    { to: '/work-orders', icon: Tool, label: 'Work Orders' },
+    { to: '/work-orders', icon: Wrench, label: 'Work Orders' },
     { to: '/lost-found', icon: ShoppingBag, label: 'Lost & Found' },
     { to: '/guests', icon: User, label: 'Guests' },
     { to: '/events', icon: Calendar, label: 'Events' },
