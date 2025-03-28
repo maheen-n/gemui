@@ -14,6 +14,7 @@ import {
   ShoppingBag,
   LucideIcon
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 interface NavItemProps {
   to: string;
@@ -64,8 +65,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
       <div className="w-64 bg-sidebar flex flex-col border-r border-sidebar-border">
-        <div className="px-4 py-6">
+        <div className="px-4 py-6 flex items-center justify-between">
           <h1 className="text-xl font-bold text-sidebar-foreground">Hotel Harmony</h1>
+          <ThemeToggle />
         </div>
 
         <div className="flex-1 px-4 py-2 space-y-1">
@@ -92,7 +94,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Main content */}
       <div className="flex-1 overflow-auto">
-        <main className="p-6">
+        <main className="p-6 max-w-7xl mx-auto">
           {children}
         </main>
       </div>

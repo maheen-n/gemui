@@ -33,7 +33,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 215 70% 40%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 215 70% 15%;
     --sidebar-foreground: 0 0% 98%;
@@ -92,5 +92,15 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .glass-morphism {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-lg;
+  }
+  
+  .neo-blur {
+    @apply backdrop-blur-2xl bg-black/40 border border-white/10;
   }
 }
