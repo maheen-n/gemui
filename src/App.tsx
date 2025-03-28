@@ -8,6 +8,13 @@ import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Rooms from "./pages/Rooms";
+import Tasks from "./pages/Tasks";
+import WorkOrders from "./pages/WorkOrders";
+import LostFound from "./pages/LostFound";
+import Guests from "./pages/Guests";
+import Events from "./pages/Events";
+import Staff from "./pages/Staff";
+import Settings from "./pages/Settings";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 const queryClient = new QueryClient();
@@ -24,7 +31,13 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/rooms" element={<Rooms />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/work-orders" element={<WorkOrders />} />
+            <Route path="/lost-found" element={<LostFound />} />
+            <Route path="/guests" element={<Guests />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/staff" element={<Staff />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
