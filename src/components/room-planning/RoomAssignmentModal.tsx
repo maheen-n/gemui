@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { 
@@ -14,6 +13,13 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { BedDouble, Calendar, User, Users } from 'lucide-react';
 import { Reservation, RoomType } from '@/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface RoomAssignmentModalProps {
   isOpen: boolean;
@@ -101,19 +107,18 @@ const RoomAssignmentModal: React.FC<RoomAssignmentModalProps> = ({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="room-number">Room Number</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {roomNumbers.map(room => (
-                    <Button
-                      key={room}
-                      type="button"
-                      variant={selectedRoom === room ? "default" : "outline"}
-                      className="h-10"
-                      onClick={() => setSelectedRoom(room)}
-                    >
-                      {room}
-                    </Button>
-                  ))}
-                </div>
+                <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a room number" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roomNumbers.map(room => (
+                      <SelectItem key={room} value={room}>
+                        {room}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-2">

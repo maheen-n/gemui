@@ -1,16 +1,9 @@
-
 import React, { useState } from 'react';
 import { addDays, format, isBefore, isAfter, startOfToday, eachDayOfInterval, addMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Reservation, RoomType } from '@/types';
 import RoomAssignmentModal from './RoomAssignmentModal';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface ReservationCalendarProps {
   reservations: Reservation[];
@@ -40,11 +33,8 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
   };
   
   const handleReservationClick = (reservation: Reservation) => {
-    // Only allow interaction for current and future reservations
-    if (!isBefore(new Date(reservation.checkIn), today)) {
-      setSelectedReservation(reservation);
-      setShowModal(true);
-    }
+    setSelectedReservation(reservation);
+    setShowModal(true);
   };
   
   const handleCloseModal = () => {
@@ -57,10 +47,6 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
       onAssignRoom(selectedReservation.id, roomNumber);
       handleCloseModal();
     }
-  };
-
-  const handleQuickAssignRoom = (reservationId: string, roomNumber: string) => {
-    onAssignRoom(reservationId, roomNumber);
   };
 
   // Group reservations by room type
@@ -121,45 +107,16 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
                     <td key={dateIndex} className="border-r p-0 relative min-w-[100px]" style={{ height: Math.max(64, dayReservations.length * 24) + 'px' }}>
                       <div className="absolute inset-0 overflow-y-auto max-h-[200px] p-1">
                         {dayReservations.map((reservation, resIndex) => (
-                          <DropdownMenu key={`${reservation.id}-${dateIndex}`}>
-                            <DropdownMenuTrigger asChild>
-                              <div 
-                                className={`mb-1 flex items-center px-2 py-1 text-xs 
-                                  ${reservation.roomNumber ? 'bg-primary text-primary-foreground' : 'bg-blue-600 text-white'} 
-                                  ${isBefore(date, today) ? 'opacity-60' : 'cursor-pointer hover:opacity-90'} 
-                                  rounded`}
-                              >
-                                {reservation.guestName}
-                              </div>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="z-50 bg-popover border shadow-md">
-                              <div className="px-2 py-1.5 text-sm font-medium">
-                                {reservation.guestName}
-                              </div>
-                              <div className="px-2 pb-1.5 text-xs text-muted-foreground">
-                                {reservation.reservationNumber} • {reservation.pax} pax
-                              </div>
-                              <div className="px-2 pb-1.5 text-xs border-b mb-1">
-                                Check-in: {format(new Date(reservation.checkIn), 'MMM d')} •
-                                Check-out: {format(new Date(reservation.checkOut), 'MMM d')}
-                              </div>
-                              {roomType.count > 0 && Array.from({ length: Math.min(5, roomType.count) }).map((_, i) => {
-                                const roomNumber = `${roomType.id}${(i + 1).toString().padStart(2, '0')}`;
-                                return (
-                                  <DropdownMenuItem 
-                                    key={roomNumber}
-                                    onClick={() => handleQuickAssignRoom(reservation.id, roomNumber)}
-                                    className={reservation.roomNumber === roomNumber ? "bg-accent" : ""}
-                                  >
-                                    Assign to Room {roomNumber}
-                                  </DropdownMenuItem>
-                                );
-                              })}
-                              <DropdownMenuItem onClick={() => handleReservationClick(reservation)}>
-                                More room options...
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div 
+                            key={`${reservation.id}-${dateIndex}`}
+                            onClick={() => handleReservationClick(reservation)}
+                            className={`mb-1 flex items-center px-2 py-1 text-xs 
+                              ${reservation.roomNumber ? 'bg-primary text-primary-foreground' : 'bg-blue-600 text-white'} 
+                              ${isBefore(date, today) ? 'opacity-60' : 'cursor-pointer hover:opacity-90'} 
+                              rounded`}
+                          >
+                            {reservation.guestName}
+                          </div>
                         ))}
                       </div>
                     </td>
