@@ -16,7 +16,22 @@ const RoomTypeList: React.FC<RoomTypeListProps> = ({
   onSelectRoomType 
 }) => {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
+      <Button
+        variant={selectedRoomTypeId === null ? "default" : "outline"}
+        className="w-full justify-start gap-3 h-auto py-3 px-4"
+        onClick={() => onSelectRoomType(selectedRoomTypeId || 'all')}
+      >
+        <BedDouble className="h-5 w-5 flex-shrink-0" />
+        <div className="flex flex-col items-start">
+          <span className="font-medium">All Rooms</span>
+          <span className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+            <Users className="h-3 w-3" />
+            {roomTypes.reduce((total, rt) => total + rt.count, 0)} rooms
+          </span>
+        </div>
+      </Button>
+      
       {roomTypes.map((roomType) => (
         <Button
           key={roomType.id}

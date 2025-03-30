@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
-import { format, isBefore, startOfToday } from 'date-fns';
+import { format, isBefore, startOfToday, addDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RoomTypeList from '@/components/room-planning/RoomTypeList';
 import ReservationCalendar from '@/components/room-planning/ReservationCalendar';
 import { RoomType, Reservation } from '@/types';
 
-// Sample room types data
+// Expanded room types data
 const roomTypesData: RoomType[] = [
   { id: '1', name: 'Standard', description: 'Standard room with basic amenities', capacity: 2, count: 10 },
   { id: '2', name: 'Deluxe', description: 'Deluxe room with premium amenities', capacity: 2, count: 8 },
@@ -17,15 +17,16 @@ const roomTypesData: RoomType[] = [
   { id: '5', name: 'Executive', description: 'Premium room with executive benefits', capacity: 2, count: 4 },
 ];
 
-// Sample reservations data
+// Expanded reservations data with more realistic scenarios
 const reservationsData: Reservation[] = [
+  // Standard Room Reservations
   {
     id: '1',
     guestName: 'John Smith',
     reservationNumber: 'RES001',
     pax: 2,
-    checkIn: '2024-06-15',
-    checkOut: '2024-06-18',
+    checkIn: format(addDays(new Date(), -2), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 3), 'yyyy-MM-dd'),
     roomTypeId: '1',
     roomNumber: '101',
     status: 'confirmed',
@@ -35,57 +36,110 @@ const reservationsData: Reservation[] = [
     id: '2',
     guestName: 'Sarah Johnson',
     reservationNumber: 'RES002',
-    pax: 3,
-    checkIn: '2024-06-20',
-    checkOut: '2024-06-25',
-    roomTypeId: '2',
-    roomNumber: '205',
+    pax: 2,
+    checkIn: format(addDays(new Date(), 1), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 6), 'yyyy-MM-dd'),
+    roomTypeId: '1',
+    roomNumber: '102',
     status: 'confirmed',
     createdAt: '2024-05-12'
   },
   {
     id: '3',
-    guestName: 'Michael Brown',
+    guestName: 'Robert Brown',
     reservationNumber: 'RES003',
-    pax: 4,
-    checkIn: '2024-06-18',
-    checkOut: '2024-06-22',
-    roomTypeId: '3',
+    pax: 1,
+    checkIn: format(addDays(new Date(), 5), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 8), 'yyyy-MM-dd'),
+    roomTypeId: '1',
     status: 'confirmed',
     createdAt: '2024-05-15'
   },
+  // Deluxe Room Reservations
   {
     id: '4',
     guestName: 'Emily Davis',
     reservationNumber: 'RES004',
     pax: 2,
-    checkIn: '2024-06-25',
-    checkOut: '2024-06-28',
-    roomTypeId: '1',
+    checkIn: format(addDays(new Date(), -4), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 2), 'yyyy-MM-dd'),
+    roomTypeId: '2',
+    roomNumber: '201',
     status: 'confirmed',
     createdAt: '2024-05-18'
   },
   {
     id: '5',
-    guestName: 'Daniel Wilson',
+    guestName: 'Michael Wilson',
     reservationNumber: 'RES005',
-    pax: 6,
-    checkIn: '2024-06-17',
-    checkOut: '2024-06-24',
-    roomTypeId: '4',
+    pax: 2,
+    checkIn: format(addDays(new Date(), 3), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 9), 'yyyy-MM-dd'),
+    roomTypeId: '2',
+    roomNumber: '202',
     status: 'confirmed',
     createdAt: '2024-05-20'
   },
+  // Suite Reservations
   {
     id: '6',
     guestName: 'Jennifer Taylor',
     reservationNumber: 'RES006',
-    pax: 2,
-    checkIn: '2024-06-22',
-    checkOut: '2024-06-26',
-    roomTypeId: '5',
+    pax: 3,
+    checkIn: format(addDays(new Date(), -1), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
+    roomTypeId: '3',
+    roomNumber: '301',
     status: 'confirmed',
     createdAt: '2024-05-22'
+  },
+  {
+    id: '7',
+    guestName: 'David Anderson',
+    reservationNumber: 'RES007',
+    pax: 4,
+    checkIn: format(addDays(new Date(), 8), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 12), 'yyyy-MM-dd'),
+    roomTypeId: '3',
+    status: 'confirmed',
+    createdAt: '2024-06-01'
+  },
+  // Family Room Reservations
+  {
+    id: '8',
+    guestName: 'Thomas Miller',
+    reservationNumber: 'RES008',
+    pax: 5,
+    checkIn: format(addDays(new Date(), 4), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 11), 'yyyy-MM-dd'),
+    roomTypeId: '4',
+    roomNumber: '401',
+    status: 'confirmed',
+    createdAt: '2024-06-05'
+  },
+  // Executive Room Reservations
+  {
+    id: '9',
+    guestName: 'Patricia Clark',
+    reservationNumber: 'RES009',
+    pax: 2,
+    checkIn: format(addDays(new Date(), 2), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 5), 'yyyy-MM-dd'),
+    roomTypeId: '5',
+    roomNumber: '501',
+    status: 'confirmed',
+    createdAt: '2024-06-08'
+  },
+  {
+    id: '10',
+    guestName: 'Elizabeth Martin',
+    reservationNumber: 'RES010',
+    pax: 1,
+    checkIn: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
+    checkOut: format(addDays(new Date(), 10), 'yyyy-MM-dd'),
+    roomTypeId: '5',
+    status: 'confirmed',
+    createdAt: '2024-06-10'
   },
 ];
 
@@ -151,43 +205,40 @@ const RoomPlanning = () => {
           </TabsList>
           
           <TabsContent value="calendar" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="md:col-span-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Room Types</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <RoomTypeList 
-                      roomTypes={roomTypesData} 
-                      selectedRoomTypeId={selectedRoomTypeId}
-                      onSelectRoomType={handleSelectRoomType}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-              <div className="md:col-span-3">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      Reservation Calendar
-                      {selectedRoomTypeId && (
-                        <span className="ml-2 text-sm text-muted-foreground">
-                          ({roomTypesData.find(rt => rt.id === selectedRoomTypeId)?.name})
-                        </span>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ReservationCalendar 
-                      reservations={filteredReservations}
-                      roomTypes={roomTypesData}
-                      onAssignRoom={handleAssignRoom}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Room Assignments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="w-full md:w-64 shrink-0">
+                      <h3 className="text-lg font-medium mb-3">Room Types</h3>
+                      <RoomTypeList 
+                        roomTypes={roomTypesData} 
+                        selectedRoomTypeId={selectedRoomTypeId}
+                        onSelectRoomType={handleSelectRoomType}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-medium mb-3">
+                        Reservation Calendar
+                        {selectedRoomTypeId && (
+                          <span className="ml-2 text-sm text-muted-foreground">
+                            ({roomTypesData.find(rt => rt.id === selectedRoomTypeId)?.name})
+                          </span>
+                        )}
+                      </h3>
+                      <ReservationCalendar 
+                        reservations={filteredReservations}
+                        roomTypes={roomTypesData}
+                        onAssignRoom={handleAssignRoom}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="list" className="mt-6">
