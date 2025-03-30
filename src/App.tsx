@@ -15,6 +15,7 @@ import Guests from "./pages/Guests";
 import Events from "./pages/Events";
 import Staff from "./pages/Staff";
 import Settings from "./pages/Settings";
+import RoomPlanning from "./pages/RoomPlanning";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 
@@ -40,6 +41,7 @@ const App = () => {
               <Route path="/events" element={<Events />} />
               <Route path="/staff" element={<Staff />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/room-planning" element={<RoomPlanning />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

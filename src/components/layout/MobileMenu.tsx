@@ -15,6 +15,7 @@ import {
   User,
   Wrench,
   ShoppingBag,
+  CalendarRange,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Link } from 'react-router-dom';
@@ -22,6 +23,7 @@ import { Link } from 'react-router-dom';
 const navItems = [
   { to: '/dashboard', icon: BarChart3, label: 'Dashboard' },
   { to: '/rooms', icon: BedDouble, label: 'Rooms' },
+  { to: '/room-planning', icon: CalendarRange, label: 'Room Planning' },
   { to: '/tasks', icon: ClipboardList, label: 'Tasks' },
   { to: '/work-orders', icon: Wrench, label: 'Work Orders' },
   { to: '/lost-found', icon: ShoppingBag, label: 'Lost & Found' },

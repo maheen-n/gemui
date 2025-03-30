@@ -141,3 +141,25 @@ export interface Notification {
   read: boolean;
   createdAt: string;
 }
+
+// New types for Room Planning
+export interface RoomType {
+  id: string;
+  name: string;
+  description: string;
+  capacity: number;
+  count: number;
+}
+
+export interface Reservation {
+  id: string;
+  guestName: string;
+  reservationNumber: string;
+  pax: number;
+  checkIn: string;
+  checkOut: string;
+  roomTypeId: string;
+  roomNumber?: string;
+  status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled';
+  createdAt: string;
+}
