@@ -23,10 +23,13 @@ const roomTypesData: RoomType[] = [
 const guestNames = [
   'Tarun Mehta', 'Anis Khan', 'Sophie Williams', 'Raj Patel', 'Emma Thompson',
   'David Chen', 'Priya Sharma', 'Michael Garcia', 'Leila Ahmed', 'James Wilson',
-  'Ananya Singh', 'Robert Johnson', 'Lakshmi Narayanan', 'Maria Rodriguez', 'Li Wei'
+  'Ananya Singh', 'Robert Johnson', 'Lakshmi Narayanan', 'Maria Rodriguez', 'Li Wei',
+  'Carlos Perez', 'Natasha Ivanovic', 'John Smith', 'Aisha Rahman', 'Pablo Escobar',
+  'Elena Rodriguez', 'Mohammed Al-Fayed', 'Siti Nurhaliza', 'Hiroshi Tanaka', 'Kim Min-ji',
+  'Fatima Hassan', 'Pedro Gonzalez', 'Mei Lin', 'Ravi Kumar', 'Sarah Johnson'
 ];
 
-// Generate expanded reservations data
+// Generate expanded reservations data with multiple bookings per day
 const generateReservations = (): Reservation[] => {
   const today = startOfToday();
   let reservations: Reservation[] = [];
@@ -34,44 +37,47 @@ const generateReservations = (): Reservation[] => {
   
   // For each room type, create multiple reservations
   roomTypesData.forEach(roomType => {
-    // Number of reservations to create for this room type
-    const numberOfReservations = Math.floor(Math.random() * 5) + 2; 
-    
-    for (let i = 0; i < numberOfReservations; i++) {
-      // Randomly select check-in date (-3 to +10 days from today)
-      const checkInOffset = Math.floor(Math.random() * 14) - 3;
-      const checkIn = addDays(today, checkInOffset);
+    // Create multiple reservations for each date range
+    // This will result in multiple bookings on the same day for the same room type
+    for (let dayOffset = -3; dayOffset <= 10; dayOffset += 2) {
+      // Number of reservations to create for this date range (2-5 bookings)
+      const numberOfReservations = Math.floor(Math.random() * 4) + 2;
       
-      // Stay duration (1 to 7 days)
-      const stayDuration = Math.floor(Math.random() * 6) + 1;
-      const checkOut = addDays(checkIn, stayDuration);
-      
-      // Random guest name
-      const guestName = guestNames[Math.floor(Math.random() * guestNames.length)];
-      
-      // Random number of guests (1 to room capacity)
-      const pax = Math.floor(Math.random() * roomType.capacity) + 1;
-      
-      // Assign room number to some reservations
-      const hasRoomAssigned = Math.random() > 0.4;
-      const roomNumber = hasRoomAssigned 
-        ? `${roomType.id}${(Math.floor(Math.random() * roomType.count) + 1).toString().padStart(2, '0')}` 
-        : undefined;
-      
-      reservations.push({
-        id: id.toString(),
-        guestName,
-        reservationNumber: `RES${(1000 + id).toString()}`,
-        pax,
-        checkIn: format(checkIn, 'yyyy-MM-dd'),
-        checkOut: format(checkOut, 'yyyy-MM-dd'),
-        roomTypeId: roomType.id,
-        roomNumber,
-        status: 'confirmed',
-        createdAt: format(addDays(checkIn, -10), 'yyyy-MM-dd')
-      });
-      
-      id++;
+      for (let i = 0; i < numberOfReservations; i++) {
+        // Create a reservation starting at this day offset
+        const checkIn = addDays(today, dayOffset);
+        
+        // Stay duration (1 to 5 days)
+        const stayDuration = Math.floor(Math.random() * 5) + 1;
+        const checkOut = addDays(checkIn, stayDuration);
+        
+        // Random guest name
+        const guestName = guestNames[Math.floor(Math.random() * guestNames.length)];
+        
+        // Random number of guests (1 to room capacity)
+        const pax = Math.floor(Math.random() * roomType.capacity) + 1;
+        
+        // Assign room number to some reservations
+        const hasRoomAssigned = Math.random() > 0.4;
+        const roomNumber = hasRoomAssigned 
+          ? `${roomType.id}${(Math.floor(Math.random() * roomType.count) + 1).toString().padStart(2, '0')}` 
+          : undefined;
+        
+        reservations.push({
+          id: id.toString(),
+          guestName,
+          reservationNumber: `RES${(1000 + id).toString()}`,
+          pax,
+          checkIn: format(checkIn, 'yyyy-MM-dd'),
+          checkOut: format(checkOut, 'yyyy-MM-dd'),
+          roomTypeId: roomType.id,
+          roomNumber,
+          status: 'confirmed',
+          createdAt: format(addDays(checkIn, -10), 'yyyy-MM-dd')
+        });
+        
+        id++;
+      }
     }
   });
   
