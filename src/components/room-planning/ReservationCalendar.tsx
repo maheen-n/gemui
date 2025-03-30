@@ -1,10 +1,16 @@
 
 import React, { useState } from 'react';
-import { addDays, format, isBefore, isAfter, startOfToday, eachDayOfInterval } from 'date-fns';
+import { addDays, format, isBefore, isAfter, startOfToday, eachDayOfInterval, addMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Reservation, RoomType } from '@/types';
 import RoomAssignmentModal from './RoomAssignmentModal';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ReservationCalendarProps {
   reservations: Reservation[];
@@ -25,12 +31,12 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
   // Generate array of dates to display (14 days from start date)
   const dates = Array.from({ length: 14 }, (_, i) => addDays(startDate, i));
   
-  const handlePreviousWeek = () => {
-    setStartDate(addDays(startDate, -7));
+  const handlePreviousMonth = () => {
+    setStartDate(prevDate => addDays(prevDate, -14));
   };
   
-  const handleNextWeek = () => {
-    setStartDate(addDays(startDate, 7));
+  const handleNextMonth = () => {
+    setStartDate(prevDate => addDays(prevDate, 14));
   };
   
   const handleReservationClick = (reservation: Reservation) => {
@@ -53,136 +59,118 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
     }
   };
 
-  // Function to get reservation cell style based on its status
-  const getReservationStyle = (reservation: Reservation, date: Date) => {
-    const checkIn = new Date(reservation.checkIn);
-    const checkOut = new Date(reservation.checkOut);
-    
-    if (date >= checkIn && date < checkOut) {
-      const isPast = isBefore(date, today);
-      const isFirstDay = date.getDate() === checkIn.getDate() && 
-                         date.getMonth() === checkIn.getMonth() && 
-                         date.getFullYear() === checkIn.getFullYear();
-      const isLastDay = date.getDate() === new Date(addDays(checkOut, -1)).getDate() && 
-                        date.getMonth() === new Date(addDays(checkOut, -1)).getMonth() && 
-                        date.getFullYear() === new Date(addDays(checkOut, -1)).getFullYear();
-      
-      return {
-        opacity: isPast ? 0.5 : 1,
-        backgroundColor: reservation.roomNumber ? 'var(--primary)' : 'var(--accent)',
-        color: reservation.roomNumber ? 'var(--primary-foreground)' : 'var(--accent-foreground)',
-        borderRadius: isFirstDay && isLastDay ? 'var(--radius)' : 
-                     isFirstDay ? 'var(--radius) 0 0 var(--radius)' : 
-                     isLastDay ? '0 var(--radius) var(--radius) 0' : '0',
-        cursor: isPast ? 'default' : 'pointer',
-      };
-    }
-    
-    return null;
+  const handleQuickAssignRoom = (reservationId: string, roomNumber: string) => {
+    onAssignRoom(reservationId, roomNumber);
   };
 
+  // Group reservations by room type
+  const reservationsByRoomType = roomTypes.reduce((acc, roomType) => {
+    acc[roomType.id] = reservations.filter(res => res.roomTypeId === roomType.id);
+    return acc;
+  }, {} as Record<string, Reservation[]>);
+
   return (
-    <div>
+    <div className="overflow-auto">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium">
-          {format(startDate, 'MMMM d, yyyy')} - {format(addDays(startDate, 13), 'MMMM d, yyyy')}
+          {format(startDate, 'MMMM yyyy')}
         </h3>
         <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={handlePreviousWeek}>
+          <Button variant="outline" size="icon" onClick={handlePreviousMonth}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" onClick={handleNextWeek}>
+          <Button variant="outline" size="icon" onClick={handleNextMonth}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
       
-      <div className="overflow-x-auto pb-2">
-        <div className="grid grid-cols-14 min-w-[800px]" style={{ gridTemplateColumns: 'repeat(14, minmax(80px, 1fr))' }}>
-          {/* Calendar header with dates */}
-          {dates.map((date, i) => (
-            <div 
-              key={i} 
-              className={`p-2 text-center border-b-2 font-medium ${
-                isBefore(date, today) ? 'text-muted-foreground' : ''
-              } ${
-                format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd') ? 'border-primary' : 'border-border'
-              }`}
-            >
-              <div>{format(date, 'EEE')}</div>
-              <div className="text-sm">{format(date, 'MMM d')}</div>
-            </div>
-          ))}
-          
-          {/* Placeholder for when no reservations match filter */}
-          {reservations.length === 0 && (
-            <div className="col-span-14 py-8 text-center text-muted-foreground">
-              No reservations found for the selected filter.
-            </div>
-          )}
-          
-          {/* Reservations grid */}
-          {reservations.map(reservation => {
-            const reservationDates = eachDayOfInterval({
-              start: new Date(reservation.checkIn),
-              end: addDays(new Date(reservation.checkOut), -1)
-            });
-            
-            // Skip reservations completely outside the visible date range
-            const hasVisibleDates = reservationDates.some(date => 
-              !isBefore(date, startDate) && !isAfter(date, addDays(startDate, 13))
-            );
-            
-            if (!hasVisibleDates) return null;
-            
-            const roomType = roomTypes.find(rt => rt.id === reservation.roomTypeId);
-            
-            return (
-              <div key={reservation.id} className="col-span-14 mt-2 flex">
-                <div className="flex items-center justify-between p-2 bg-card border min-w-[200px] mr-1 rounded-md">
-                  <div>
-                    <div className="font-medium">{reservation.guestName}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {reservation.reservationNumber} • {reservation.pax} pax • {roomType?.name}
-                    </div>
+      <div className="relative overflow-x-auto border rounded-md">
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th className="sticky left-0 z-10 bg-background border-r min-w-[180px] p-2">Room Type</th>
+              {dates.map((date, i) => (
+                <th key={i} className={`p-2 text-center border-r font-medium text-sm ${
+                  isBefore(date, today) ? 'text-muted-foreground' : ''
+                } ${
+                  format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd') ? 'bg-accent/30' : ''
+                }`}>
+                  <div className="whitespace-nowrap">
+                    {i === 0 && format(date, 'MMM')} {format(date, 'd')}
                   </div>
-                </div>
-                
-                {/* Reservation cells for each date */}
-                <div className="flex-1 grid grid-cols-14" style={{ gridTemplateColumns: 'repeat(14, 1fr)' }}>
-                  {dates.map((date, i) => {
-                    const style = getReservationStyle(reservation, date);
-                    
-                    if (!style) {
-                      return <div key={i} className="border-r border-border last:border-r-0" />;
-                    }
-                    
-                    return (
-                      <div
-                        key={i}
-                        className="border-r border-border last:border-r-0 h-full"
-                        style={{ backgroundColor: style.backgroundColor }}
-                      >
-                        <div
-                          className="h-full flex items-center justify-center p-1 text-xs font-medium transition-opacity hover:opacity-90"
-                          style={{
-                            color: style.color,
-                            borderRadius: style.borderRadius,
-                            cursor: style.cursor,
-                            opacity: style.opacity
-                          }}
-                          onClick={() => style.cursor !== 'default' && handleReservationClick(reservation)}
-                        >
-                          {reservation.roomNumber}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                  <div className="text-xs text-muted-foreground">{format(date, 'EEE')}</div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {roomTypes.map(roomType => (
+              <tr key={roomType.id} className="border-t">
+                <td className="sticky left-0 z-10 bg-background border-r p-3 font-medium">
+                  {roomType.name}
+                </td>
+                {dates.map((date, dateIndex) => {
+                  const dayReservations = reservationsByRoomType[roomType.id]?.filter(res => {
+                    const checkIn = new Date(res.checkIn);
+                    const checkOut = new Date(res.checkOut);
+                    return date >= checkIn && date < checkOut;
+                  }) || [];
+
+                  return (
+                    <td key={dateIndex} className="border-r p-0 relative min-w-[100px] h-16">
+                      {dayReservations.map((reservation, resIndex) => (
+                        <DropdownMenu key={`${reservation.id}-${dateIndex}`}>
+                          <DropdownMenuTrigger asChild>
+                            <div 
+                              className={`absolute inset-1 flex items-center px-2 py-1 text-xs 
+                                ${reservation.roomNumber ? 'bg-primary text-primary-foreground' : 'bg-blue-600 text-white'} 
+                                ${isBefore(date, today) ? 'opacity-60' : 'cursor-pointer hover:opacity-90'} 
+                                rounded`}
+                              style={{
+                                top: `${resIndex * 24}px`,
+                                zIndex: 5 + resIndex
+                              }}
+                            >
+                              {reservation.guestName}
+                            </div>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <div className="px-2 py-1.5 text-sm font-medium">
+                              {reservation.guestName}
+                            </div>
+                            <div className="px-2 pb-1.5 text-xs text-muted-foreground">
+                              {reservation.reservationNumber} • {reservation.pax} pax
+                            </div>
+                            <div className="px-2 pb-1.5 text-xs border-b mb-1">
+                              Check-in: {format(new Date(reservation.checkIn), 'MMM d')} •
+                              Check-out: {format(new Date(reservation.checkOut), 'MMM d')}
+                            </div>
+                            {roomType.count > 0 && Array.from({ length: Math.min(5, roomType.count) }).map((_, i) => {
+                              const roomNumber = `${roomType.id}${(i + 1).toString().padStart(2, '0')}`;
+                              return (
+                                <DropdownMenuItem 
+                                  key={roomNumber}
+                                  onClick={() => handleQuickAssignRoom(reservation.id, roomNumber)}
+                                  className={reservation.roomNumber === roomNumber ? "bg-accent" : ""}
+                                >
+                                  Assign to Room {roomNumber}
+                                </DropdownMenuItem>
+                              );
+                            })}
+                            <DropdownMenuItem onClick={() => handleReservationClick(reservation)}>
+                              More room options...
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ))}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
       
       {/* Room assignment modal */}
