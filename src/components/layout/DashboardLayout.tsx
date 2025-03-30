@@ -15,6 +15,7 @@ import {
   LucideIcon
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { MobileMenu } from './MobileMenu';
 
 interface NavItemProps {
   to: string;
@@ -27,10 +28,10 @@ const NavItem = ({ to, icon, label, isActive }: NavItemProps) => {
   return (
     <Link
       to={to}
-      className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+      className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-200 ${
         isActive
-          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-          : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+          ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+          : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:translate-x-1'
       }`}
     >
       {icon}
@@ -62,15 +63,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <div className="w-64 bg-sidebar flex flex-col border-r border-sidebar-border">
-        <div className="px-4 py-6 flex items-center justify-between">
+    <div className="flex h-screen bg-background transition-colors duration-300">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex md:w-64 bg-sidebar flex-col border-r border-sidebar-border shadow-lg transition-all duration-300">
+        <div className="px-4 py-6 flex items-center justify-between border-b border-sidebar-border">
           <h1 className="text-xl font-bold text-sidebar-foreground">Hotel Harmony</h1>
           <ThemeToggle />
         </div>
 
-        <div className="flex-1 px-4 py-2 space-y-1">
+        <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
             <NavItem
               key={item.to}
@@ -93,9 +94,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto">
-        <main className="p-6 max-w-7xl mx-auto">
-          {children}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile Header */}
+        <header className="h-16 md:h-0 flex items-center justify-between px-4 border-b border-border md:border-0 bg-background">
+          <div className="flex items-center gap-4">
+            <MobileMenu />
+            <h1 className="text-lg font-bold md:hidden">Hotel Harmony</h1>
+          </div>
+          <div className="md:hidden">
+            <ThemeToggle />
+          </div>
+        </header>
+        
+        {/* Content */}
+        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto space-y-6">
+            {children}
+          </div>
         </main>
       </div>
     </div>

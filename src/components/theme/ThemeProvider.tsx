@@ -22,7 +22,11 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
     
+    // Remove existing theme classes
     root.classList.remove("light", "dark");
+    
+    // Add transition class for smooth switching
+    root.classList.add("transition-colors", "duration-300");
     
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
