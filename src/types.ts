@@ -1,3 +1,4 @@
+
 export interface Reservation {
   id: string;
   reservationNumber: string;
@@ -8,4 +9,5 @@ export interface Reservation {
   pax: number;
   status: string;
   createdAt: string;
+  roomNumber?: string;
 } 

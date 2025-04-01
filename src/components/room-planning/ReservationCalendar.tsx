@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { addDays, format, isBefore, isAfter, startOfToday, eachDayOfInterval, addMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -104,18 +105,23 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
                   }) || [];
 
                   return (
-                    <td key={dateIndex} className="border-r p-0 relative min-w-[100px]" style={{ height: Math.max(64, dayReservations.length * 24) + 'px' }}>
-                      <div className="absolute inset-0 overflow-y-auto max-h-[200px] p-1">
+                    <td key={dateIndex} className="border-r p-0 relative min-w-[100px]" style={{ height: Math.max(64, dayReservations.length * 28) + 'px' }}>
+                      <div className="absolute inset-0 p-1">
                         {dayReservations.map((reservation, resIndex) => (
                           <div 
                             key={`${reservation.id}-${dateIndex}`}
                             onClick={() => handleReservationClick(reservation)}
-                            className={`mb-1 flex items-center px-2 py-1 text-xs 
-                              ${reservation.roomNumber ? 'bg-cyan-600 text-white' : 'bg-gray-500 text-white'} 
+                            className={`mb-1 flex items-center justify-between px-2 py-1 text-xs 
+                              ${reservation.roomNumber ? 'bg-blue-100 text-blue-900 border border-blue-200' : 'bg-gray-100 text-gray-800 border border-gray-200'} 
                               ${isBefore(date, today) ? 'opacity-60' : 'cursor-pointer hover:opacity-90'} 
                               rounded`}
                           >
-                            {reservation.guestName}
+                            <span className="truncate">{reservation.guestName}</span>
+                            {reservation.roomNumber && (
+                              <span className="ml-1 px-1 bg-blue-200 text-blue-800 rounded text-[10px]">
+                                {reservation.roomNumber}
+                              </span>
+                            )}
                           </div>
                         ))}
                       </div>

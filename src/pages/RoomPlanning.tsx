@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import { format, isBefore, startOfToday, addDays } from 'date-fns';
@@ -52,8 +53,8 @@ const generateReservations = (): Reservation[] => {
         // Random number of guests (1 to room capacity)
         const pax = Math.floor(Math.random() * roomType.capacity) + 1;
         
-        // Assign room number to some reservations
-        const hasRoomAssigned = Math.random() > 0.4;
+        // Assign room number to only a few reservations (20% chance)
+        const hasRoomAssigned = Math.random() > 0.8;
         const roomNumber = hasRoomAssigned 
           ? `${roomType.id}${(Math.floor(Math.random() * roomType.count) + 1).toString().padStart(2, '0')}` 
           : undefined;
@@ -132,7 +133,7 @@ const RoomPlanning = () => {
         </div>
 
         <Card>
-          <CardContent>
+          <CardContent className="pt-6">
             <ReservationCalendar 
               reservations={reservations}
               roomTypes={roomTypesData}
