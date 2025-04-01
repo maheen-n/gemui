@@ -1,15 +1,16 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { format, addDays, startOfToday, startOfWeek, addMinutes, parseISO, isWithinInterval, isSameDay } from 'date-fns';
-import { SpaService, SpaServiceDuration } from '@/types';
-import SpaCalendar from '@/components/spa-booking/SpaCalendar';
-import ServiceSelection from '@/components/spa-booking/ServiceSelection';
-import BookingForm from '@/components/spa-booking/BookingForm';
+import { format, addDays, startOfToday, parseISO, isSameDay } from 'date-fns';
+import { SpaService, SpaServiceDuration, SpaBooking } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Calendar, Clock, Users, Flower2 } from 'lucide-react';
+import SpaServicesList from '@/components/spa-booking/SpaServicesList';
+import SpaCalendarView from '@/components/spa-booking/SpaCalendarView';
+import SpaBookingModal from '@/components/spa-booking/SpaBookingModal';
+import { useToast } from '@/components/ui/use-toast';
 
 // Demo data - Spa Services
 const spaServices: SpaService[] = [
@@ -89,9 +90,9 @@ const spaServices: SpaService[] = [
 ];
 
 // Demo data - Existing Bookings
-const generateDemoBookings = (): import('@/types').SpaBooking[] => {
+const generateDemoBookings = (): SpaBooking[] => {
   const today = startOfToday();
-  const bookings: import('@/types').SpaBooking[] = [];
+  const bookings: SpaBooking[] = [];
   
   // Generate some bookings for the next 7 days
   for (let i = 0; i < 20; i++) {
@@ -111,7 +112,9 @@ const generateDemoBookings = (): import('@/types').SpaBooking[] => {
     bookingDate.setHours(hours, minutes, 0, 0);
     
     const startTime = bookingDate.toISOString();
-    const endTime = addMinutes(bookingDate, duration.minutes).toISOString();
+    const endTime = addDays(new Date(startTime), 0);
+    endTime.setHours(hours);
+    endTime.setMinutes(minutes + duration.minutes);
     
     bookings.push({
       id: `booking-${i + 1}`,
@@ -122,7 +125,7 @@ const generateDemoBookings = (): import('@/types').SpaBooking[] => {
       durationId: duration.id,
       durationMinutes: duration.minutes,
       startTime,
-      endTime,
+      endTime: endTime.toISOString(),
       status: ['booked', 'completed'][Math.floor(Math.random() * 2)] as 'booked' | 'completed',
       therapistId: `therapist-${Math.floor(Math.random() * 5) + 1}`,
       therapistName: ['John Doe', 'Jane Smith', 'David Johnson', 'Sarah Williams', 'Robert Chen'][Math.floor(Math.random() * 5)],
@@ -137,39 +140,29 @@ const generateDemoBookings = (): import('@/types').SpaBooking[] => {
 const existingBookings = generateDemoBookings();
 
 const SpaBookingPage = () => {
+  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
   const [selectedService, setSelectedService] = useState<SpaService | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<SpaServiceDuration | null>(null);
+  const [calendarView, setCalendarView] = useState<'day' | 'week' | 'month'>('day');
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
   const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'couples'>('all');
-  const [calendarView, setCalendarView] = useState<'day' | 'week' | 'month'>('day');
   
   // Filter bookings for the selected date
-  const filteredBookings = existingBookings.filter(booking => {
-    return calendarView === 'day' 
-      ? isSameDay(parseISO(booking.startTime), selectedDate)
-      : isWithinInterval(parseISO(booking.startTime), {
-          start: startOfWeek(selectedDate),
-          end: addDays(startOfWeek(selectedDate), 6)
-        });
-  });
+  const filteredBookings = existingBookings.filter(booking => 
+    isSameDay(parseISO(booking.startTime), selectedDate)
+  );
 
   // Handle service selection
   const handleServiceSelect = (service: SpaService) => {
     setSelectedService(service);
-    setSelectedDuration(null);
-    setSelectedTimeSlot(null);
+    setSelectedDuration(service.durations[0]); // Default to first duration
   };
 
   // Handle duration selection
   const handleDurationSelect = (duration: SpaServiceDuration) => {
     setSelectedDuration(duration);
-    setSelectedTimeSlot(null);
-  };
-
-  // Handle time slot selection
-  const handleTimeSlotSelect = (timeSlot: string) => {
-    setSelectedTimeSlot(timeSlot);
   };
 
   // Handle date change
@@ -177,6 +170,23 @@ const SpaBookingPage = () => {
     if (date) {
       setSelectedDate(date);
     }
+  };
+
+  // Handle time slot selection
+  const handleTimeSlotSelect = (timeSlot: string) => {
+    setSelectedTimeSlot(timeSlot);
+    setIsBookingModalOpen(true);
+  };
+  
+  // Handle booking submission
+  const handleBookingSubmit = (bookingData: any) => {
+    console.log('Booking submitted:', bookingData);
+    toast({
+      title: "Booking successful!",
+      description: `${bookingData.serviceName} booked for ${bookingData.guestName} on ${format(selectedDate, 'MMMM d, yyyy')} at ${format(parseISO(selectedTimeSlot!), 'h:mm a')}`,
+    });
+    setIsBookingModalOpen(false);
+    setSelectedTimeSlot(null);
   };
 
   return (
@@ -189,21 +199,21 @@ const SpaBookingPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column - Service Selection */}
-          <div className="space-y-6 md:col-span-1">
-            <Card>
+          <div className="space-y-6 lg:col-span-1">
+            <Card className="h-full">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Users className="mr-2 h-5 w-5" />
-                  Guest & Service Details
+                  <Flower2 className="mr-2 h-5 w-5" />
+                  Spa Services
                 </CardTitle>
                 <CardDescription>
                   Select a service and duration
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <ServiceSelection 
+              <CardContent className="pb-6">
+                <SpaServicesList 
                   services={spaServices}
                   selectedService={selectedService}
                   selectedDuration={selectedDuration}
@@ -214,30 +224,10 @@ const SpaBookingPage = () => {
                 />
               </CardContent>
             </Card>
-
-            {selectedService && selectedDuration && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Booking Details</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <BookingForm 
-                    service={selectedService}
-                    duration={selectedDuration}
-                    selectedDate={selectedDate}
-                    selectedTimeSlot={selectedTimeSlot}
-                    onSubmit={() => {
-                      // Handle booking submission
-                      console.log('Booking submitted');
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           {/* Right column - Calendar */}
-          <div className="md:col-span-2">
+          <div className="lg:col-span-2">
             <Card className="h-full">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -257,7 +247,7 @@ const SpaBookingPage = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <SpaCalendar 
+                <SpaCalendarView 
                   bookings={filteredBookings}
                   services={spaServices}
                   selectedDate={selectedDate}
@@ -266,44 +256,24 @@ const SpaBookingPage = () => {
                   calendarView={calendarView}
                   onDateChange={handleDateChange}
                   onTimeSlotSelect={handleTimeSlotSelect}
-                  selectedTimeSlot={selectedTimeSlot}
                 />
               </CardContent>
             </Card>
           </div>
         </div>
-
-        {/* Bottom section - Booking Legend */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle>Booking Status Legend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full bg-blue-500 mr-2"></div>
-                <span>Available</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full bg-gray-400 mr-2"></div>
-                <span>Booked</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
-                <span>Completed</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full bg-yellow-500 mr-2"></div>
-                <span>Peak Hours</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full bg-red-200 mr-2"></div>
-                <span>Preparation Time</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+      
+      {isBookingModalOpen && selectedService && selectedDuration && selectedTimeSlot && (
+        <SpaBookingModal
+          isOpen={isBookingModalOpen}
+          onClose={() => setIsBookingModalOpen(false)}
+          service={selectedService}
+          duration={selectedDuration}
+          selectedDate={selectedDate}
+          selectedTimeSlot={selectedTimeSlot}
+          onSubmit={handleBookingSubmit}
+        />
+      )}
     </DashboardLayout>
   );
 };
