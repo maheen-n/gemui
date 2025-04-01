@@ -1,13 +1,12 @@
-
 import React, { useState } from 'react';
-import { format, parseISO, addMinutes } from 'date-fns';
+import { format, parseISO, addMinutes, set } from 'date-fns';
 import { SpaService, SpaServiceDuration } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Clock, User, Sparkles } from 'lucide-react';
+import { Calendar, Clock, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,21 +15,25 @@ import { useToast } from '@/components/ui/use-toast';
 interface SpaBookingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  service: SpaService;
-  duration: SpaServiceDuration;
+  service: SpaService | null;
+  duration: SpaServiceDuration | null;
   selectedDate: Date;
-  selectedTimeSlot: string;
+  selectedTimeSlot: string | null;
   onSubmit: (bookingData: any) => void;
+  isCustomBooking?: boolean;
+  services?: SpaService[];
 }
 
 const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
   isOpen,
   onClose,
-  service,
-  duration,
+  service: initialService,
+  duration: initialDuration,
   selectedDate,
   selectedTimeSlot,
-  onSubmit
+  onSubmit,
+  isCustomBooking = false,
+  services = []
 }) => {
   const { toast } = useToast();
   const [guestName, setGuestName] = useState('');
@@ -38,6 +41,9 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
   const [specialRequests, setSpecialRequests] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
   const [therapist, setTherapist] = useState('');
+  const [customTime, setCustomTime] = useState('09:00');
+  const [selectedService, setSelectedService] = useState<SpaService | null>(initialService);
+  const [selectedDuration, setSelectedDuration] = useState<SpaServiceDuration | null>(initialDuration);
   
   // Mock therapists
   const mockTherapists = [
@@ -47,6 +53,17 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
     { id: 'therapist-4', name: 'Sarah Williams' },
     { id: 'therapist-5', name: 'Robert Chen' },
   ];
+
+  const handleServiceChange = (serviceId: string) => {
+    const service = services.find(s => s.id === serviceId);
+    setSelectedService(service || null);
+    setSelectedDuration(service?.durations[0] || null);
+  };
+
+  const handleDurationChange = (durationId: string) => {
+    const duration = selectedService?.durations.find(d => d.id === durationId);
+    setSelectedDuration(duration || null);
+  };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,69 +76,142 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
       });
       return;
     }
+
+    if (!selectedService || !selectedDuration) {
+      toast({
+        variant: "destructive",
+        title: "Service selection required",
+        description: "Please select a service and duration for the booking.",
+      });
+      return;
+    }
+    
+    let bookingTime = selectedTimeSlot;
+    if (isCustomBooking && customTime) {
+      const [hours, minutes] = customTime.split(':').map(Number);
+      const customDate = set(selectedDate, { hours, minutes });
+      bookingTime = customDate.toISOString();
+    }
     
     const bookingData = {
-      serviceId: service.id,
-      serviceName: service.name,
-      durationId: duration.id,
-      durationMinutes: duration.minutes,
-      price: duration.price,
-      selectedDate,
-      startTime: selectedTimeSlot,
-      endTime: format(addMinutes(parseISO(selectedTimeSlot), duration.minutes), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
       guestName,
       guestEmail,
       specialRequests,
       roomNumber,
       therapistId: therapist,
       therapistName: mockTherapists.find(t => t.id === therapist)?.name || '',
+      serviceId: selectedService.id,
+      serviceName: selectedService.name,
+      durationId: selectedDuration.id,
+      durationMinutes: selectedDuration.minutes,
+      price: selectedDuration.price,
+      startTime: bookingTime,
+      selectedDate
     };
     
     onSubmit(bookingData);
+    
+    setGuestName('');
+    setGuestEmail('');
+    setSpecialRequests('');
+    setRoomNumber('');
+    setTherapist('');
+    setCustomTime('09:00');
+    setSelectedService(null);
+    setSelectedDuration(null);
   };
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Book {service.name}</DialogTitle>
+          <DialogTitle>
+            {isCustomBooking ? 'Create Custom Booking' : 'Book Spa Service'}
+          </DialogTitle>
           <DialogDescription>
             Fill in the details to complete the booking
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="flex flex-col space-y-2 rounded-md border p-3 bg-muted/50">
-            <div className="flex justify-between items-center">
-              <div className="font-medium">{service.name}</div>
-              <Badge>{service.category}</Badge>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="service">Service *</Label>
+              <Select
+                value={selectedService?.id || ''}
+                onValueChange={handleServiceChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a service" />
+                </SelectTrigger>
+                <SelectContent>
+                  {services.map((service) => (
+                    <SelectItem key={service.id} value={service.id}>
+                      {service.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div className="flex items-center text-sm text-muted-foreground space-x-4">
-              <div className="flex items-center">
-                <Clock className="mr-1 h-4 w-4" />
-                <span>{duration.minutes} minutes</span>
+
+            {selectedService && (
+              <div className="space-y-2">
+                <Label htmlFor="duration">Duration *</Label>
+                <Select
+                  value={selectedDuration?.id || ''}
+                  onValueChange={handleDurationChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectedService.durations.map((duration) => (
+                      <SelectItem key={duration.id} value={duration.id}>
+                        {duration.minutes} minutes - ${duration.price}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <div>${duration.price}</div>
-            </div>
-            
-            <Separator className="my-2" />
-            
-            <div className="flex justify-between text-sm">
-              <div className="flex items-center">
-                <Calendar className="mr-1 h-4 w-4" />
-                <span>{format(selectedDate, 'MMM d, yyyy')}</span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="mr-1 h-4 w-4" />
-                <span>
-                  {format(parseISO(selectedTimeSlot), 'h:mm a')} - {
-                    format(addMinutes(parseISO(selectedTimeSlot), duration.minutes), 'h:mm a')
-                  }
-                </span>
-              </div>
-            </div>
+            )}
           </div>
+
+          {selectedService && selectedDuration && (
+            <div className="flex flex-col space-y-2 rounded-md border p-3 bg-muted/50">
+              <div className="flex justify-between items-center">
+                <div className="font-medium">{selectedService.name}</div>
+                <Badge>{selectedService.category}</Badge>
+              </div>
+              
+              <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                <div className="flex items-center">
+                  <Clock className="mr-1 h-4 w-4" />
+                  <span>{selectedDuration.minutes} minutes</span>
+                </div>
+                <div>${selectedDuration.price}</div>
+              </div>
+              
+              <Separator className="my-2" />
+              
+              <div className="flex justify-between text-sm">
+                <div className="flex items-center">
+                  <Calendar className="mr-1 h-4 w-4" />
+                  <span>{format(selectedDate, 'MMM d, yyyy')}</span>
+                </div>
+                {isCustomBooking ? (
+                  <div className="flex items-center">
+                    <Clock className="mr-1 h-4 w-4" />
+                    <span>{customTime}</span>
+                  </div>
+                ) : selectedTimeSlot ? (
+                  <div className="flex items-center">
+                    <Clock className="mr-1 h-4 w-4" />
+                    <span>{format(parseISO(selectedTimeSlot), 'h:mm a')}</span>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          )}
           
           <div className="space-y-2">
             <Label htmlFor="guestName">Guest Name *</Label>
@@ -184,6 +274,21 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
               className="min-h-[80px]"
             />
           </div>
+          
+          {isCustomBooking && (
+            <div className="space-y-2">
+              <Label htmlFor="customTime">Time *</Label>
+              <Input
+                id="customTime"
+                type="time"
+                value={customTime}
+                onChange={(e) => setCustomTime(e.target.value)}
+                min="09:00"
+                max="19:00"
+                required
+              />
+            </div>
+          )}
           
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>

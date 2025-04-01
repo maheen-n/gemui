@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { format, addDays, startOfToday, parseISO, isSameDay } from 'date-fns';
@@ -6,11 +5,12 @@ import { SpaService, SpaServiceDuration, SpaBooking } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Users, Flower2 } from 'lucide-react';
+import { Calendar, Clock, Users, Flower2, Plus } from 'lucide-react';
 import SpaServicesList from '@/components/spa-booking/SpaServicesList';
 import SpaCalendarView from '@/components/spa-booking/SpaCalendarView';
 import SpaBookingModal from '@/components/spa-booking/SpaBookingModal';
 import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
 
 // Demo data - Spa Services
 const spaServices: SpaService[] = [
@@ -148,6 +148,7 @@ const SpaBookingPage = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
   const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'couples'>('all');
+  const [isCustomBooking, setIsCustomBooking] = useState(false);
   
   // Filter bookings for the selected date
   const filteredBookings = existingBookings.filter(booking => 
@@ -172,8 +173,18 @@ const SpaBookingPage = () => {
     }
   };
 
+  // Handle custom booking
+  const handleCustomBooking = () => {
+    setIsCustomBooking(true);
+    setSelectedTimeSlot(selectedDate.toISOString()); // Use selected date as default
+    setSelectedService(null); // Reset service selection for custom booking
+    setSelectedDuration(null); // Reset duration selection for custom booking
+    setIsBookingModalOpen(true);
+  };
+
   // Handle time slot selection
   const handleTimeSlotSelect = (timeSlot: string) => {
+    setIsCustomBooking(false);
     setSelectedTimeSlot(timeSlot);
     setIsBookingModalOpen(true);
   };
@@ -183,20 +194,29 @@ const SpaBookingPage = () => {
     console.log('Booking submitted:', bookingData);
     toast({
       title: "Booking successful!",
-      description: `${bookingData.serviceName} booked for ${bookingData.guestName} on ${format(selectedDate, 'MMMM d, yyyy')} at ${format(parseISO(selectedTimeSlot!), 'h:mm a')}`,
+      description: `${bookingData.serviceName} booked for ${bookingData.guestName} on ${format(selectedDate, 'MMMM d, yyyy')} at ${format(parseISO(bookingData.startTime), 'h:mm a')}`,
     });
     setIsBookingModalOpen(false);
     setSelectedTimeSlot(null);
+    setIsCustomBooking(false);
+    setSelectedService(null);
+    setSelectedDuration(null);
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Spa Booking Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Book spa services for guests based on availability and preferences
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Spa Booking Management</h1>
+            <p className="text-muted-foreground mt-2">
+              Book spa services for guests based on availability and preferences
+            </p>
+          </div>
+          <Button onClick={handleCustomBooking} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Custom Booking
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -263,15 +283,22 @@ const SpaBookingPage = () => {
         </div>
       </div>
       
-      {isBookingModalOpen && selectedService && selectedDuration && selectedTimeSlot && (
+      {isBookingModalOpen && (
         <SpaBookingModal
           isOpen={isBookingModalOpen}
-          onClose={() => setIsBookingModalOpen(false)}
+          onClose={() => {
+            setIsBookingModalOpen(false);
+            setIsCustomBooking(false);
+            setSelectedService(null);
+            setSelectedDuration(null);
+          }}
           service={selectedService}
           duration={selectedDuration}
           selectedDate={selectedDate}
           selectedTimeSlot={selectedTimeSlot}
           onSubmit={handleBookingSubmit}
+          isCustomBooking={isCustomBooking}
+          services={spaServices}
         />
       )}
     </DashboardLayout>
