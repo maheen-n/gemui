@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, addMinutes } from 'date-fns';
 import { SpaService, SpaServiceDuration } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
