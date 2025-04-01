@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +45,7 @@ const initialRooms: Room[] = [
     floor: 1,
     capacity: 2,
     rate: 99,
+    price: 99,
     amenities: ['TV', 'WiFi', 'Air Conditioning'],
     lastCleaned: '2023-10-15T10:30:00Z',
   },
@@ -57,6 +57,7 @@ const initialRooms: Room[] = [
     floor: 1,
     capacity: 2,
     rate: 99,
+    price: 99,
     amenities: ['TV', 'WiFi', 'Air Conditioning'],
     lastCleaned: '2023-10-14T11:00:00Z',
   },
@@ -68,6 +69,7 @@ const initialRooms: Room[] = [
     floor: 2,
     capacity: 3,
     rate: 149,
+    price: 149,
     amenities: ['TV', 'WiFi', 'Air Conditioning', 'Mini Bar', 'Ocean View'],
     lastCleaned: '2023-10-15T09:15:00Z',
   },
@@ -79,6 +81,7 @@ const initialRooms: Room[] = [
     floor: 2,
     capacity: 3,
     rate: 149,
+    price: 149,
     amenities: ['TV', 'WiFi', 'Air Conditioning', 'Mini Bar', 'Ocean View'],
   },
   {
@@ -89,6 +92,7 @@ const initialRooms: Room[] = [
     floor: 3,
     capacity: 4,
     rate: 249,
+    price: 249,
     amenities: ['TV', 'WiFi', 'Air Conditioning', 'Mini Bar', 'Ocean View', 'Balcony', 'Jacuzzi'],
     lastCleaned: '2023-10-15T08:30:00Z',
   },
@@ -100,6 +104,7 @@ const initialRooms: Room[] = [
     floor: 3,
     capacity: 4,
     rate: 249,
+    price: 249,
     amenities: ['TV', 'WiFi', 'Air Conditioning', 'Mini Bar', 'Ocean View', 'Balcony', 'Jacuzzi'],
   },
   {
@@ -110,6 +115,7 @@ const initialRooms: Room[] = [
     floor: 4,
     capacity: 6,
     rate: 499,
+    price: 499,
     amenities: ['TV', 'WiFi', 'Air Conditioning', 'Mini Bar', 'Ocean View', 'Balcony', 'Jacuzzi', 'Sauna', 'Kitchen'],
     lastCleaned: '2023-10-14T13:00:00Z',
   },

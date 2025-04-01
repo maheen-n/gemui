@@ -1,4 +1,3 @@
-
 // Add missing types related to SpaBooking functionality
 
 export interface Room {
@@ -8,9 +7,9 @@ export interface Room {
   status: 'available' | 'occupied' | 'maintenance' | 'cleaning';
   floor: number;
   capacity: number;
-  price: number;
+  price?: number; // Make price optional
+  rate: number; // Add rate property which is used in Rooms.tsx
   amenities: string[];
-  rate: number;
   lastCleaned?: string;
 }
 
