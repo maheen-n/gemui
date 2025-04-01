@@ -6,11 +6,10 @@ import { SpaService, SpaServiceDuration, SpaBooking } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Users, Flower2 } from 'lucide-react';
-import SpaServicesList from '@/components/spa-booking/SpaServicesList';
-import SpaCalendarView from '@/components/spa-booking/SpaCalendarView';
-import SpaBookingModal from '@/components/spa-booking/SpaBookingModal';
+import { Calendar, Clock, Users, Flower2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import SpaBookingModal from '@/components/spa-booking/SpaBookingModal';
 
 // Demo data - Spa Services
 const spaServices: SpaService[] = [
@@ -139,31 +138,81 @@ const generateDemoBookings = (): SpaBooking[] => {
 
 const existingBookings = generateDemoBookings();
 
+// Generate available time slots for the selected service and date
+const generateAvailableSlots = (
+  date: Date, 
+  service: SpaService | null, 
+  duration: SpaServiceDuration | null, 
+  bookings: SpaBooking[]
+) => {
+  if (!service || !duration) return [];
+  
+  const slots = [];
+  const START_HOUR = 9; // 9 AM
+  const END_HOUR = 18;  // 6 PM
+  
+  for (let hour = START_HOUR; hour <= END_HOUR; hour++) {
+    for (let minute of [0, 30]) {
+      const slotTime = new Date(date);
+      slotTime.setHours(hour, minute, 0, 0);
+      
+      // Skip if the slot is in the past
+      if (slotTime < new Date()) continue;
+      
+      // Check if this slot conflicts with any booking
+      const slotEnd = new Date(slotTime);
+      slotEnd.setMinutes(slotTime.getMinutes() + duration.minutes);
+      
+      const isBooked = bookings.some(booking => {
+        const bookingStart = parseISO(booking.startTime);
+        const bookingEnd = parseISO(booking.endTime);
+        
+        return (
+          (slotTime >= bookingStart && slotTime < bookingEnd) ||
+          (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
+          (slotTime <= bookingStart && slotEnd >= bookingEnd)
+        );
+      });
+      
+      if (!isBooked) {
+        slots.push({
+          time: slotTime.toISOString(),
+          endTime: slotEnd.toISOString(),
+          formattedTime: format(slotTime, 'h:mm a')
+        });
+      }
+    }
+  }
+  
+  return slots;
+};
+
 const SpaBookingPage = () => {
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
   const [selectedService, setSelectedService] = useState<SpaService | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<SpaServiceDuration | null>(null);
-  const [calendarView, setCalendarView] = useState<'day' | 'week' | 'month'>('day');
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
-  const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'couples'>('all');
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   
   // Filter bookings for the selected date
   const filteredBookings = existingBookings.filter(booking => 
     isSameDay(parseISO(booking.startTime), selectedDate)
   );
 
-  // Handle service selection
-  const handleServiceSelect = (service: SpaService) => {
-    setSelectedService(service);
-    setSelectedDuration(service.durations[0]); // Default to first duration
-  };
-
-  // Handle duration selection
-  const handleDurationSelect = (duration: SpaServiceDuration) => {
-    setSelectedDuration(duration);
-  };
+  // Filter services by category
+  const filteredServices = spaServices.filter(service => 
+    activeCategory === "all" || service.category === activeCategory
+  );
+  
+  // Get available slots for the selected date and service
+  const availableSlots = generateAvailableSlots(
+    selectedDate, 
+    selectedService, 
+    selectedDuration, 
+    filteredBookings
+  );
 
   // Handle date change
   const handleDateChange = (date: Date | undefined) => {
@@ -178,9 +227,19 @@ const SpaBookingPage = () => {
     setIsBookingModalOpen(true);
   };
   
+  // Handle service selection
+  const handleServiceSelect = (service: SpaService) => {
+    setSelectedService(service);
+    setSelectedDuration(service.durations[0]); // Default to first duration
+  };
+
+  // Handle duration selection
+  const handleDurationSelect = (duration: SpaServiceDuration) => {
+    setSelectedDuration(duration);
+  };
+  
   // Handle booking submission
   const handleBookingSubmit = (bookingData: any) => {
-    console.log('Booking submitted:', bookingData);
     toast({
       title: "Booking successful!",
       description: `${bookingData.serviceName} booked for ${bookingData.guestName} on ${format(selectedDate, 'MMMM d, yyyy')} at ${format(parseISO(selectedTimeSlot!), 'h:mm a')}`,
@@ -189,74 +248,192 @@ const SpaBookingPage = () => {
     setSelectedTimeSlot(null);
   };
 
+  // Navigation between days
+  const handlePrevDay = () => {
+    setSelectedDate(addDays(selectedDate, -1));
+  };
+  
+  const handleNextDay = () => {
+    setSelectedDate(addDays(selectedDate, 1));
+  };
+  
+  // Get unique categories
+  const categories = ["all", ...Array.from(new Set(spaServices.map(service => service.category)))];
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Spa Booking Management</h1>
           <p className="text-muted-foreground mt-2">
-            Book spa services for guests based on availability and preferences
+            Book spa services for guests based on availability
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left column - Service Selection */}
-          <div className="space-y-6 lg:col-span-1">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Flower2 className="mr-2 h-5 w-5" />
-                  Spa Services
-                </CardTitle>
-                <CardDescription>
-                  Select a service and duration
-                </CardDescription>
+          <div className="lg:col-span-3 space-y-4">
+            <Card>
+              <CardHeader className="py-4">
+                <CardTitle className="text-lg font-medium">Spa Services</CardTitle>
               </CardHeader>
-              <CardContent className="pb-6">
-                <SpaServicesList 
-                  services={spaServices}
-                  selectedService={selectedService}
-                  selectedDuration={selectedDuration}
-                  genderFilter={genderFilter}
-                  onServiceSelect={handleServiceSelect}
-                  onDurationSelect={handleDurationSelect}
-                  onGenderFilterChange={setGenderFilter}
-                />
+              <CardContent className="px-0 py-0">
+                <div className="border-t">
+                  <Tabs defaultValue="all" value={activeCategory} onValueChange={setActiveCategory}>
+                    <div className="px-4 py-2 bg-muted/50">
+                      <TabsList className="grid grid-cols-3 w-full">
+                        <TabsTrigger value="all">All</TabsTrigger>
+                        <TabsTrigger value="Massages">Massage</TabsTrigger>
+                        <TabsTrigger value="Facials">Facial</TabsTrigger>
+                      </TabsList>
+                    </div>
+                    <div className="divide-y">
+                      {filteredServices.map(service => (
+                        <div 
+                          key={service.id}
+                          className={`p-4 cursor-pointer hover:bg-muted/50 ${selectedService?.id === service.id ? 'bg-muted/70 border-l-4 border-primary' : ''}`}
+                          onClick={() => handleServiceSelect(service)}
+                        >
+                          <div className="flex justify-between items-start mb-1">
+                            <div className="font-medium">{service.name}</div>
+                            <Badge variant="outline" className="ml-2">
+                              {service.category}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                            {service.description}
+                          </p>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {service.durations.map(duration => (
+                              <Badge 
+                                key={duration.id}
+                                variant={selectedService?.id === service.id && selectedDuration?.id === duration.id ? "default" : "outline"}
+                                className="cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleServiceSelect(service);
+                                  handleDurationSelect(duration);
+                                }}
+                              >
+                                {duration.minutes} min - ${duration.price}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Tabs>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Right column - Calendar */}
-          <div className="lg:col-span-2">
-            <Card className="h-full">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Spa Calendar
+          {/* Right column - Calendar and Slots */}
+          <div className="lg:col-span-9">
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <CardTitle>
+                    {selectedService ? (
+                      <div className="flex items-center">
+                        <span>{selectedService.name}</span>
+                        {selectedDuration && (
+                          <Badge variant="outline" className="ml-2">
+                            {selectedDuration.minutes} min - ${selectedDuration.price}
+                          </Badge>
+                        )}
+                      </div>
+                    ) : (
+                      <span>Available Time Slots</span>
+                    )}
                   </CardTitle>
-                  <div className="flex space-x-2">
-                    <Tabs value={calendarView} onValueChange={(value) => setCalendarView(value as 'day' | 'week' | 'month')}>
-                      <TabsList className="grid grid-cols-3 w-[200px]">
-                        <TabsTrigger value="day">Day</TabsTrigger>
-                        <TabsTrigger value="week">Week</TabsTrigger>
-                        <TabsTrigger value="month">Month</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm" onClick={handlePrevDay}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <div className="text-sm font-medium whitespace-nowrap">
+                      {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+                    </div>
+                    <Button variant="outline" size="sm" onClick={handleNextDay}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <SpaCalendarView 
-                  bookings={filteredBookings}
-                  services={spaServices}
-                  selectedDate={selectedDate}
-                  selectedService={selectedService}
-                  selectedDuration={selectedDuration}
-                  calendarView={calendarView}
-                  onDateChange={handleDateChange}
-                  onTimeSlotSelect={handleTimeSlotSelect}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Calendar */}
+                  <div className="border rounded-md p-3">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={handleDateChange}
+                      className="pointer-events-auto"
+                      initialFocus
+                    />
+                  </div>
+                  
+                  {/* Available Slots */}
+                  <div className="border rounded-md p-4">
+                    <h3 className="font-medium mb-3">Available Slots</h3>
+                    {selectedService && selectedDuration ? (
+                      availableSlots.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {availableSlots.map((slot, index) => (
+                            <Button
+                              key={index}
+                              variant={selectedTimeSlot === slot.time ? "default" : "outline"}
+                              className="h-auto py-2"
+                              onClick={() => handleTimeSlotSelect(slot.time)}
+                            >
+                              <Clock className="h-3 w-3 mr-1" />
+                              {slot.formattedTime}
+                            </Button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No available slots for this service on the selected date.
+                        </div>
+                      )
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        Select a service and duration to view available slots.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Today's Bookings */}
+                <div className="mt-6">
+                  <h3 className="font-medium mb-3">Bookings for {format(selectedDate, 'MMMM d, yyyy')}</h3>
+                  {filteredBookings.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {filteredBookings
+                        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+                        .map((booking, index) => (
+                          <div key={index} className="border rounded-md p-3">
+                            <div className="font-medium">{booking.serviceName}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {booking.guestName}
+                            </div>
+                            <div className="flex items-center mt-1 text-sm">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {format(parseISO(booking.startTime), 'h:mm a')} - {format(parseISO(booking.endTime), 'h:mm a')}
+                            </div>
+                            <Badge className="mt-2" variant={booking.status === 'booked' ? 'outline' : 'secondary'}>
+                              {booking.status}
+                            </Badge>
+                          </div>
+                        ))
+                    }
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground border rounded-md">
+                      No bookings for this day.
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
