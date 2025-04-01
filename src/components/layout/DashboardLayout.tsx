@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -24,7 +23,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  Flower2
+  Flower2,
+  Sparkles
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MobileMenu } from './MobileMenu';
@@ -130,6 +130,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { to: '/guest-management', icon: User, label: 'Guest Management', children: [
       { to: '/room-planning', icon: CalendarRange, label: 'Room Planning' },
       { to: '/guest-management/reservations', icon: Calendar, label: 'Reservations' },
+      { to: '/guest-management/spa-booking', icon: Sparkles, label: 'Spa Booking' },
       { to: '/guest-profiles', icon: Users, label: 'Guest Profiles' },
       { to: '/loyalty-transactions', icon: Wallet, label: 'Loyalty Transactions' },
       { to: '/segments', icon: Users2, label: 'Segments' }

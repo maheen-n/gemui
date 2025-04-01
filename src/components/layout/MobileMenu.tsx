@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -24,7 +23,7 @@ import {
   Cog,
   Wallet,
   ChevronDown,
-  Flower2
+  Sparkles
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Link } from 'react-router-dom';
@@ -44,7 +43,7 @@ const navItems: NavItem[] = [
   { to: '/guest-management', icon: User, label: 'Guest Management', children: [
     { to: '/room-planning', icon: CalendarRange, label: 'Room Planning' },
     { to: '/guest-management/reservations', icon: Calendar, label: 'Reservations' },
-    { to: '/guest-management/spa-booking', icon: Flower2, label: 'Spa Booking' },
+    { to: '/guest-management/spa-booking', icon: Sparkles, label: 'Spa Booking' },
     { to: '/guest-profiles', icon: Users, label: 'Guest Profiles' },
     { to: '/loyalty-transactions', icon: Wallet, label: 'Loyalty Transactions' },
     { to: '/segments', icon: Users2, label: 'Segments' }
