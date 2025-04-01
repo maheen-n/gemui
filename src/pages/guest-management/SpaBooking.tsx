@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { format, addDays, startOfToday, startOfWeek, addMinutes, parseISO, isWithinInterval, isSameDay } from 'date-fns';
-import { SpaService, SpaBooking, SpaServiceDuration } from '@/types';
+import { SpaService, SpaServiceDuration } from '@/types';
 import SpaCalendar from '@/components/spa-booking/SpaCalendar';
 import ServiceSelection from '@/components/spa-booking/ServiceSelection';
 import BookingForm from '@/components/spa-booking/BookingForm';
@@ -135,9 +135,12 @@ const generateDemoBookings = (): SpaBooking[] => {
   return bookings;
 };
 
+// Import the type to avoid naming conflict with the component
+import type { SpaBooking as SpaBookingType } from '@/types';
+
 const existingBookings = generateDemoBookings();
 
-const SpaBooking = () => {
+const SpaBookingPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
   const [selectedService, setSelectedService] = useState<SpaService | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<SpaServiceDuration | null>(null);
@@ -309,4 +312,4 @@ const SpaBooking = () => {
   );
 };
 
-export default SpaBooking;
+export default SpaBookingPage;
