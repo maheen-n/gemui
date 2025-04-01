@@ -1,14 +1,9 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import { format, isBefore, startOfToday, addDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ReservationCalendar from '@/components/room-planning/ReservationCalendar';
 import { RoomType, Reservation } from '@/types';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 // Expanded room types data with more descriptive names
 const roomTypesData: RoomType[] = [
@@ -89,7 +84,6 @@ const reservationsData = generateReservations();
 const RoomPlanning = () => {
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<string | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>(reservationsData);
-  const [activeTab, setActiveTab] = useState('calendar');
 
   const filteredReservations = selectedRoomTypeId 
     ? reservations.filter(res => res.roomTypeId === selectedRoomTypeId) 
@@ -137,66 +131,15 @@ const RoomPlanning = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="calendar" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList>
-            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-            <TabsTrigger value="list">List View</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="calendar" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Room Assignments</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ReservationCalendar 
-                  reservations={reservations}
-                  roomTypes={roomTypesData}
-                  onAssignRoom={handleAssignRoom}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="list" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Reservation List</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Guest</TableHead>
-                      <TableHead>Reservation</TableHead>
-                      <TableHead>Room Type</TableHead>
-                      <TableHead>Room</TableHead>
-                      <TableHead>Check In</TableHead>
-                      <TableHead>Check Out</TableHead>
-                      <TableHead>Pax</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredReservations.map(reservation => {
-                      const roomType = roomTypesData.find(rt => rt.id === reservation.roomTypeId);
-                      return (
-                        <TableRow key={reservation.id}>
-                          <TableCell className="font-medium">{reservation.guestName}</TableCell>
-                          <TableCell>{reservation.reservationNumber}</TableCell>
-                          <TableCell>{roomType?.name}</TableCell>
-                          <TableCell>{reservation.roomNumber || 'Unassigned'}</TableCell>
-                          <TableCell>{format(new Date(reservation.checkIn), 'MMM dd, yyyy')}</TableCell>
-                          <TableCell>{format(new Date(reservation.checkOut), 'MMM dd, yyyy')}</TableCell>
-                          <TableCell>{reservation.pax}</TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <Card>
+          <CardContent>
+            <ReservationCalendar 
+              reservations={reservations}
+              roomTypes={roomTypesData}
+              onAssignRoom={handleAssignRoom}
+            />
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

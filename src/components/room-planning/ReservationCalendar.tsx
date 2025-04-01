@@ -111,7 +111,7 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
                             key={`${reservation.id}-${dateIndex}`}
                             onClick={() => handleReservationClick(reservation)}
                             className={`mb-1 flex items-center px-2 py-1 text-xs 
-                              ${reservation.roomNumber ? 'bg-primary text-primary-foreground' : 'bg-blue-600 text-white'} 
+                              ${reservation.roomNumber ? 'bg-cyan-600 text-white' : 'bg-gray-500 text-white'} 
                               ${isBefore(date, today) ? 'opacity-60' : 'cursor-pointer hover:opacity-90'} 
                               rounded`}
                           >
