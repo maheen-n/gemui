@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import { format, isBefore, startOfToday, addDays } from 'date-fns';
@@ -8,11 +7,11 @@ import { RoomType, Reservation } from '@/types';
 
 // Expanded room types data with more descriptive names
 const roomTypesData: RoomType[] = [
-  { id: '1', name: 'Heritage Mansion', description: 'Luxurious heritage-style mansion with private garden', capacity: 4, count: 3 },
-  { id: '2', name: 'Heritage Bungalow', description: 'Elegant bungalow with colonial architecture', capacity: 2, count: 5 },
-  { id: '3', name: 'Lake Front Villa', description: 'Spacious villa with panoramic lake views', capacity: 6, count: 2 },
-  { id: '4', name: 'Garden Cottage', description: 'Cozy cottage surrounded by lush gardens', capacity: 2, count: 8 },
-  { id: '5', name: 'Executive Suite', description: 'Premium suite with executive amenities', capacity: 2, count: 4 },
+  { id: '1', name: 'Heritage Mansion', description: 'Luxurious heritage-style mansion with private garden', capacity: 4, count: 3, price: 450, amenities: ['Private Garden', 'Luxury Bathtub', 'King Bed', 'Smart TV'] },
+  { id: '2', name: 'Heritage Bungalow', description: 'Elegant bungalow with colonial architecture', capacity: 2, count: 5, price: 350, amenities: ['Private Terrace', 'Queen Bed', 'Mini Bar', 'Smart TV'] },
+  { id: '3', name: 'Lake Front Villa', description: 'Spacious villa with panoramic lake views', capacity: 6, count: 2, price: 550, amenities: ['Lake View', 'Private Balcony', 'Kitchenette', 'Multiple Bedrooms'] },
+  { id: '4', name: 'Garden Cottage', description: 'Cozy cottage surrounded by lush gardens', capacity: 2, count: 8, price: 250, amenities: ['Garden View', 'Queen Bed', 'Breakfast Nook', 'Coffee Maker'] },
+  { id: '5', name: 'Executive Suite', description: 'Premium suite with executive amenities', capacity: 2, count: 4, price: 400, amenities: ['Work Desk', 'Premium Coffee', 'King Bed', 'City View'] },
 ];
 
 // Generate more realistic guest names

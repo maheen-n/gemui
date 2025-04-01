@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -22,7 +23,8 @@ import {
   LucideIcon,
   ChevronLeft,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  Flower2
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MobileMenu } from './MobileMenu';
