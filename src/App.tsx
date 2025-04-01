@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -17,6 +18,7 @@ import Staff from "./pages/Staff";
 import Settings from "./pages/Settings";
 import RoomPlanning from "./pages/RoomPlanning";
 import Reservations from "./pages/guest-management/Reservations";
+import SpaBooking from "./pages/guest-management/SpaBooking";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 
@@ -46,6 +48,7 @@ const App: React.FC = () => {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/room-planning" element={<RoomPlanning />} />
                 <Route path="/guest-management/reservations" element={<Reservations />} />
+                <Route path="/guest-management/spa-booking" element={<SpaBooking />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

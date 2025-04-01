@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -160,5 +161,51 @@ export interface Reservation {
   roomTypeId: string;
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled';
+  createdAt: string;
+}
+
+// New types for SPA Booking
+export interface SpaService {
+  id: string;
+  name: string;
+  description: string;
+  durations: SpaServiceDuration[];
+  genderCriteria: 'male' | 'female' | 'couples' | 'all';
+  preparationTime: number; // in minutes
+  image?: string;
+  category: string;
+}
+
+export interface SpaServiceDuration {
+  id: string;
+  minutes: number;
+  price: number;
+}
+
+export interface SpaTimeSlot {
+  id: string;
+  startTime: string;
+  endTime: string;
+  serviceId: string;
+  durationId: string;
+  isAvailable: boolean;
+  isPeakHour?: boolean;
+}
+
+export interface SpaBooking {
+  id: string;
+  guestId: string;
+  guestName: string;
+  serviceId: string;
+  serviceName: string;
+  durationId: string;
+  durationMinutes: number;
+  startTime: string;
+  endTime: string;
+  status: 'booked' | 'completed' | 'cancelled' | 'no-show';
+  therapistId?: string;
+  therapistName?: string;
+  roomId?: string;
+  specialRequests?: string;
   createdAt: string;
 }
