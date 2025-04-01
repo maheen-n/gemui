@@ -10,6 +10,8 @@ export interface Room {
   capacity: number;
   price: number;
   amenities: string[];
+  rate: number;
+  lastCleaned?: string;
 }
 
 export interface RoomType {
@@ -20,6 +22,7 @@ export interface RoomType {
   capacity: number;
   amenities: string[];
   image?: string;
+  count: number;
 }
 
 export interface SpaService {
@@ -48,9 +51,25 @@ export interface SpaBooking {
   durationMinutes: number;
   startTime: string;
   endTime: string;
-  status: 'booked' | 'completed' | 'cancelled';
-  therapistId: string;
-  therapistName: string;
-  roomId: string;
+  status: 'booked' | 'completed' | 'cancelled' | 'no-show';
+  therapistId?: string;
+  therapistName?: string;
+  roomId?: string;
   createdAt: string;
 }
+
+export interface Reservation {
+  id: string;
+  guestName: string;
+  reservationNumber: string;
+  pax: number;
+  checkIn: string;
+  checkOut: string;
+  roomTypeId: string;
+  roomNumber?: string;
+  status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled';
+  createdAt: string;
+}
+
+// Type alias for Reservation to avoid conflicts in Reservations.tsx
+export type GuestReservation = Reservation;
