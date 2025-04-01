@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { format, addDays, startOfToday, startOfWeek, addMinutes, parseISO, isWithinInterval, isSameDay } from 'date-fns';
@@ -10,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Clock, Users } from 'lucide-react';
+import { Calendar, Clock, Users, Flower2 } from 'lucide-react';
 
 // Demo data - Spa Services
 const spaServices: SpaService[] = [
@@ -90,9 +89,9 @@ const spaServices: SpaService[] = [
 ];
 
 // Demo data - Existing Bookings
-const generateDemoBookings = (): SpaBooking[] => {
+const generateDemoBookings = (): import('@/types').SpaBooking[] => {
   const today = startOfToday();
-  const bookings: SpaBooking[] = [];
+  const bookings: import('@/types').SpaBooking[] = [];
   
   // Generate some bookings for the next 7 days
   for (let i = 0; i < 20; i++) {
@@ -134,9 +133,6 @@ const generateDemoBookings = (): SpaBooking[] => {
   
   return bookings;
 };
-
-// Import the type to avoid naming conflict with the component
-import type { SpaBooking as SpaBookingType } from '@/types';
 
 const existingBookings = generateDemoBookings();
 

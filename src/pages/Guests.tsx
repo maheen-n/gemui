@@ -1,4 +1,3 @@
-
 import React from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
-import { PlusCircle, Search, User, Calendar, Lotus } from 'lucide-react';
+import { PlusCircle, Search, User, Calendar, Flower2 } from 'lucide-react';
 import { useState } from 'react';
 
 const Guests = () => {
@@ -71,7 +70,7 @@ const Guests = () => {
               Reservations
             </TabsTrigger>
             <TabsTrigger value="spa" className="flex items-center">
-              <Lotus className="mr-2 h-4 w-4" />
+              <Flower2 className="mr-2 h-4 w-4" />
               Spa Bookings
             </TabsTrigger>
           </TabsList>
@@ -168,7 +167,7 @@ const Guests = () => {
               <h3 className="text-lg font-medium">Spa & Wellness Bookings</h3>
               <Button asChild>
                 <Link to="/guest-management/spa-booking">
-                  <Lotus className="mr-2 h-4 w-4" />
+                  <Flower2 className="mr-2 h-4 w-4" />
                   Go to Spa Booking
                 </Link>
               </Button>
@@ -176,7 +175,7 @@ const Guests = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="text-center py-8">
-                  <Lotus className="h-12 w-12 mx-auto text-muted-foreground" />
+                  <Flower2 className="h-12 w-12 mx-auto text-muted-foreground" />
                   <h3 className="mt-4 text-lg font-medium">Manage Spa Bookings</h3>
                   <p className="mt-2 text-muted-foreground">
                     Book and manage spa services for guests. View availability and schedule appointments.
