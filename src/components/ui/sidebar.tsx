@@ -19,8 +19,8 @@ export function Sidebar({
   footer,
   collapsible = false,
   defaultCollapsed = false,
-  width = "w-52", // Changed from w-56 to w-52 (even smaller width)
-  collapsedWidth = "w-14",
+  width = "w-60", // Changed from w-52 to w-60 for a better experience
+  collapsedWidth = "w-16", // Changed from w-14 to w-16 for better icon display
   ...props
 }: SidebarProps) {
   const [collapsed, setCollapsed] = React.useState(defaultCollapsed);
@@ -30,7 +30,7 @@ export function Sidebar({
       className={cn(
         "flex flex-col border-r bg-background",
         collapsed ? collapsedWidth : width,
-        "transition-width duration-300",
+        "transition-all duration-300 ease-in-out",
         className
       )}
       {...props}
@@ -40,18 +40,19 @@ export function Sidebar({
           <div className="flex justify-end p-2">
             <button
               onClick={() => setCollapsed(!collapsed)}
-              className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-accent"
+              className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <ChevronRight
                 className={cn(
-                  "h-4 w-4 transition-transform",
+                  "h-4 w-4 transition-transform duration-200",
                   collapsed ? "" : "rotate-180"
                 )}
               />
             </button>
           </div>
         )}
-        <div className="flex-1 overflow-auto">{children}</div>
+        <div className="flex-1 overflow-auto py-2">{children}</div>
         {footer && (
           <div className="mt-auto border-t p-4 overflow-hidden">{footer}</div>
         )}
