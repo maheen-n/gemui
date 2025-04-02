@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight, Clock, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SpaBooking, SpaService, SpaServiceDuration } from '@/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import type { DayContentProps } from 'react-day-picker';
+import { type DayContentProps } from 'react-day-picker';
 
 interface SpaCalendarViewProps {
   bookings: SpaBooking[];
@@ -395,14 +395,14 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
       return acc;
     }, {});
 
-    const CustomDayContent = (dayProps: DayContentProps) => {
-      const { date, displayMonth, selected, disabled, hidden, activeModifiers, ...rest } = dayProps;
+    const CustomDayContent = (props: DayContentProps) => {
+      const { date } = props;
       const dateStr = format(date, 'yyyy-MM-dd');
       const count = bookingDates[dateStr] || 0;
 
       return (
         <div className="relative w-full h-full flex items-center justify-center">
-          <div>{dayProps.children}</div>
+          <div>{props.content}</div>
           {count > 0 && (
             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-[8px] font-bold text-primary">
               {count}
