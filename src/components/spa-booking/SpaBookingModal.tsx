@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { format, parseISO, addMinutes, set } from 'date-fns';
 import { SpaService, SpaServiceDuration } from '@/types';
@@ -11,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SpaBookingModalProps {
   isOpen: boolean;
@@ -123,7 +125,7 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh]">
         <DialogHeader>
           <DialogTitle>
             {isCustomBooking ? 'Create Custom Booking' : 'Book Spa Service'}
@@ -133,172 +135,174 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="service">Service *</Label>
-              <Select
-                value={selectedService?.id || ''}
-                onValueChange={handleServiceChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a service" />
-                </SelectTrigger>
-                <SelectContent>
-                  {services.map((service) => (
-                    <SelectItem key={service.id} value={service.id}>
-                      {service.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {selectedService && (
+        <ScrollArea className="pr-4 max-h-[60vh]">
+          <form onSubmit={handleSubmit} className="space-y-4 py-2">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="duration">Duration *</Label>
+                <Label htmlFor="service">Service *</Label>
                 <Select
-                  value={selectedDuration?.id || ''}
-                  onValueChange={handleDurationChange}
+                  value={selectedService?.id || ''}
+                  onValueChange={handleServiceChange}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select duration" />
+                    <SelectValue placeholder="Select a service" />
                   </SelectTrigger>
                   <SelectContent>
-                    {selectedService.durations.map((duration) => (
-                      <SelectItem key={duration.id} value={duration.id}>
-                        {duration.minutes} minutes - ${duration.price}
+                    {services.map((service) => (
+                      <SelectItem key={service.id} value={service.id}>
+                        {service.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-            )}
-          </div>
 
-          {selectedService && selectedDuration && (
-            <div className="flex flex-col space-y-2 rounded-md border p-3 bg-muted/50">
-              <div className="flex justify-between items-center">
-                <div className="font-medium">{selectedService.name}</div>
-                <Badge>{selectedService.category}</Badge>
-              </div>
-              
-              <div className="flex items-center text-sm text-muted-foreground space-x-4">
-                <div className="flex items-center">
-                  <Clock className="mr-1 h-4 w-4" />
-                  <span>{selectedDuration.minutes} minutes</span>
+              {selectedService && (
+                <div className="space-y-2">
+                  <Label htmlFor="duration">Duration *</Label>
+                  <Select
+                    value={selectedDuration?.id || ''}
+                    onValueChange={handleDurationChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedService.durations.map((duration) => (
+                        <SelectItem key={duration.id} value={duration.id}>
+                          {duration.minutes} minutes - ${duration.price}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>${selectedDuration.price}</div>
-              </div>
-              
-              <Separator className="my-2" />
-              
-              <div className="flex justify-between text-sm">
-                <div className="flex items-center">
-                  <Calendar className="mr-1 h-4 w-4" />
-                  <span>{format(selectedDate, 'MMM d, yyyy')}</span>
-                </div>
-                {isCustomBooking ? (
-                  <div className="flex items-center">
-                    <Clock className="mr-1 h-4 w-4" />
-                    <span>{customTime}</span>
-                  </div>
-                ) : selectedTimeSlot ? (
-                  <div className="flex items-center">
-                    <Clock className="mr-1 h-4 w-4" />
-                    <span>{format(parseISO(selectedTimeSlot), 'h:mm a')}</span>
-                  </div>
-                ) : null}
-              </div>
+              )}
             </div>
-          )}
-          
-          <div className="space-y-2">
-            <Label htmlFor="guestName">Guest Name *</Label>
-            <Input
-              id="guestName"
-              placeholder="Enter guest name"
-              value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="guestEmail">Guest Email</Label>
-            <Input
-              id="guestEmail"
-              type="email"
-              placeholder="Enter guest email"
-              value={guestEmail}
-              onChange={(e) => setGuestEmail(e.target.value)}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="roomNumber">Room Number (if staying at hotel)</Label>
-            <Input
-              id="roomNumber"
-              placeholder="Enter room number"
-              value={roomNumber}
-              onChange={(e) => setRoomNumber(e.target.value)}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="therapist">Preferred Therapist</Label>
-            <Select
-              value={therapist}
-              onValueChange={setTherapist}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a therapist" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockTherapists.map((therapist) => (
-                  <SelectItem key={therapist.id} value={therapist.id}>
-                    {therapist.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="specialRequests">Special Requests</Label>
-            <Textarea
-              id="specialRequests"
-              placeholder="Any special requests or notes"
-              value={specialRequests}
-              onChange={(e) => setSpecialRequests(e.target.value)}
-              className="min-h-[80px]"
-            />
-          </div>
-          
-          {isCustomBooking && (
+
+            {selectedService && selectedDuration && (
+              <div className="flex flex-col space-y-2 rounded-md border p-3 bg-muted/50">
+                <div className="flex justify-between items-center">
+                  <div className="font-medium">{selectedService.name}</div>
+                  <Badge>{selectedService.category}</Badge>
+                </div>
+                
+                <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                  <div className="flex items-center">
+                    <Clock className="mr-1 h-4 w-4" />
+                    <span>{selectedDuration.minutes} minutes</span>
+                  </div>
+                  <div>${selectedDuration.price}</div>
+                </div>
+                
+                <Separator className="my-2" />
+                
+                <div className="flex justify-between text-sm">
+                  <div className="flex items-center">
+                    <Calendar className="mr-1 h-4 w-4" />
+                    <span>{format(selectedDate, 'MMM d, yyyy')}</span>
+                  </div>
+                  {isCustomBooking ? (
+                    <div className="flex items-center">
+                      <Clock className="mr-1 h-4 w-4" />
+                      <span>{customTime}</span>
+                    </div>
+                  ) : selectedTimeSlot ? (
+                    <div className="flex items-center">
+                      <Clock className="mr-1 h-4 w-4" />
+                      <span>{format(parseISO(selectedTimeSlot), 'h:mm a')}</span>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            )}
+            
             <div className="space-y-2">
-              <Label htmlFor="customTime">Time *</Label>
+              <Label htmlFor="guestName">Guest Name *</Label>
               <Input
-                id="customTime"
-                type="time"
-                value={customTime}
-                onChange={(e) => setCustomTime(e.target.value)}
-                min="09:00"
-                max="19:00"
+                id="guestName"
+                placeholder="Enter guest name"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
                 required
               />
             </div>
-          )}
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              Confirm Booking
-            </Button>
-          </DialogFooter>
-        </form>
+            
+            <div className="space-y-2">
+              <Label htmlFor="guestEmail">Guest Email</Label>
+              <Input
+                id="guestEmail"
+                type="email"
+                placeholder="Enter guest email"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="roomNumber">Room Number (if staying at hotel)</Label>
+              <Input
+                id="roomNumber"
+                placeholder="Enter room number"
+                value={roomNumber}
+                onChange={(e) => setRoomNumber(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="therapist">Preferred Therapist</Label>
+              <Select
+                value={therapist}
+                onValueChange={setTherapist}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a therapist" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockTherapists.map((therapist) => (
+                    <SelectItem key={therapist.id} value={therapist.id}>
+                      {therapist.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="specialRequests">Special Requests</Label>
+              <Textarea
+                id="specialRequests"
+                placeholder="Any special requests or notes"
+                value={specialRequests}
+                onChange={(e) => setSpecialRequests(e.target.value)}
+                className="min-h-[80px]"
+              />
+            </div>
+            
+            {isCustomBooking && (
+              <div className="space-y-2">
+                <Label htmlFor="customTime">Time *</Label>
+                <Input
+                  id="customTime"
+                  type="time"
+                  value={customTime}
+                  onChange={(e) => setCustomTime(e.target.value)}
+                  min="09:00"
+                  max="19:00"
+                  required
+                />
+              </div>
+            )}
+          </form>
+        </ScrollArea>
+        
+        <DialogFooter className="mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" onClick={handleSubmit}>
+            Confirm Booking
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
