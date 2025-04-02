@@ -19,7 +19,7 @@ export function Sidebar({
   footer,
   collapsible = false,
   defaultCollapsed = false,
-  width = "w-60", // Changed from w-64 to w-60
+  width = "w-56", // Changed from w-60 to w-56 (smaller width)
   collapsedWidth = "w-14",
   ...props
 }: SidebarProps) {

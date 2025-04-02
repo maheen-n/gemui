@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { format, addDays, startOfToday, parseISO, isSameDay } from 'date-fns';
+import { format, addDays, startOfToday, parseISO, isSameDay, addHours, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
 import { SpaService, SpaServiceDuration, SpaBooking } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -90,54 +89,113 @@ const spaServices: SpaService[] = [
   },
 ];
 
-// Demo data - Existing Bookings
+// Guest names for demo data
+const guestNames = [
+  'James Wilson', 'Emma Thompson', 'Michael Brown', 'Olivia Garcia', 'William Davis', 
+  'Sophia Martinez', 'Benjamin Johnson', 'Mia Rodriguez', 'Jacob Martinez', 'Charlotte Clark',
+  'Amelia Lewis', 'Ethan Walker', 'Isabella Hall', 'Alexander White', 'Sophie Allen',
+  'Daniel King', 'Ava Wright', 'Matthew Scott', 'Emily Adams', 'David Phillips'
+];
+
+// Therapist names for demo data
+const therapistNames = [
+  'John Doe', 'Jane Smith', 'David Johnson', 'Sarah Williams', 'Robert Chen',
+  'Maria Rodriguez', 'Thomas Moore', 'Lisa Garcia', 'Michael Taylor', 'Amanda Lee'
+];
+
+// Room IDs for demo data
+const roomIds = ['room-1', 'room-2', 'room-3', 'room-4', 'room-5'];
+
+// Demo data - Comprehensive Bookings for the whole month
 const generateDemoBookings = (): SpaBooking[] => {
   const today = startOfToday();
   const bookings: SpaBooking[] = [];
+  let id = 1;
   
-  // Generate some bookings for the next 7 days
-  for (let i = 0; i < 20; i++) {
-    const randomServiceIndex = Math.floor(Math.random() * spaServices.length);
-    const service = spaServices[randomServiceIndex];
+  // Generate bookings for the current month
+  const monthStart = startOfMonth(today);
+  const monthEnd = endOfMonth(today);
+  const daysInMonth = differenceInDays(monthEnd, monthStart) + 1;
+  
+  // Create bookings for each day of the month
+  for (let dayOffset = -7; dayOffset <= daysInMonth + 7; dayOffset++) {
+    const currentDate = addDays(monthStart, dayOffset);
     
-    const randomDurationIndex = Math.floor(Math.random() * service.durations.length);
-    const duration = service.durations[randomDurationIndex];
+    // Generate different number of bookings for different days
+    // More bookings on weekends, fewer on weekdays
+    const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6;
+    const numberOfBookings = isWeekend ? 
+      Math.floor(Math.random() * 5) + 8 : // 8-12 bookings on weekends
+      Math.floor(Math.random() * 4) + 3;  // 3-6 bookings on weekdays
     
-    const dayOffset = Math.floor(Math.random() * 7); // 0-6 days ahead
-    const bookingDate = addDays(today, dayOffset);
-    
-    // Random hour between 9 AM and 6 PM
-    const hours = 9 + Math.floor(Math.random() * 9);
-    const minutes = Math.random() > 0.5 ? 30 : 0;
-    
-    bookingDate.setHours(hours, minutes, 0, 0);
-    
-    const startTime = bookingDate.toISOString();
-    const endTime = addDays(new Date(startTime), 0);
-    endTime.setHours(hours);
-    endTime.setMinutes(minutes + duration.minutes);
-    
-    bookings.push({
-      id: `booking-${i + 1}`,
-      guestId: `guest-${Math.floor(Math.random() * 100) + 1}`,
-      guestName: ['James Wilson', 'Emma Thompson', 'Michael Brown', 'Olivia Garcia', 'Sophia Martinez'][Math.floor(Math.random() * 5)],
-      serviceId: service.id,
-      serviceName: service.name,
-      durationId: duration.id,
-      durationMinutes: duration.minutes,
-      startTime,
-      endTime: endTime.toISOString(),
-      status: ['booked', 'completed'][Math.floor(Math.random() * 2)] as 'booked' | 'completed',
-      therapistId: `therapist-${Math.floor(Math.random() * 5) + 1}`,
-      therapistName: ['John Doe', 'Jane Smith', 'David Johnson', 'Sarah Williams', 'Robert Chen'][Math.floor(Math.random() * 5)],
-      roomId: `room-${Math.floor(Math.random() * 5) + 1}`,
-      createdAt: addDays(new Date(startTime), -3).toISOString()
-    });
+    for (let i = 0; i < numberOfBookings; i++) {
+      // Randomly select a service
+      const randomServiceIndex = Math.floor(Math.random() * spaServices.length);
+      const service = spaServices[randomServiceIndex];
+      
+      // Randomly select a duration
+      const randomDurationIndex = Math.floor(Math.random() * service.durations.length);
+      const duration = service.durations[randomDurationIndex];
+      
+      // Random hour between 9 AM and 6 PM
+      const hours = 9 + Math.floor(Math.random() * 9);
+      const minutes = Math.random() > 0.5 ? 30 : 0;
+      
+      const bookingDate = new Date(currentDate);
+      bookingDate.setHours(hours, minutes, 0, 0);
+      
+      const startTime = bookingDate.toISOString();
+      const endTime = addHours(new Date(startTime), duration.minutes / 60).toISOString();
+      
+      // Randomly select a guest
+      const guestName = guestNames[Math.floor(Math.random() * guestNames.length)];
+      
+      // Randomly select a therapist
+      const therapistName = therapistNames[Math.floor(Math.random() * therapistNames.length)];
+      
+      // Randomly select a room
+      const roomId = roomIds[Math.floor(Math.random() * roomIds.length)];
+      
+      // Determine booking status based on date
+      // Past bookings are marked as completed, future as booked
+      const isPastBooking = bookingDate < today;
+      const status = isPastBooking ? 'completed' : 'booked';
+      
+      bookings.push({
+        id: `booking-${id}`,
+        guestId: `guest-${Math.floor(Math.random() * 100) + 1}`,
+        guestName,
+        serviceId: service.id,
+        serviceName: service.name,
+        durationId: duration.id,
+        durationMinutes: duration.minutes,
+        startTime,
+        endTime,
+        status: status as 'booked' | 'completed' | 'cancelled' | 'no-show',
+        therapistId: `therapist-${Math.floor(Math.random() * 10) + 1}`,
+        therapistName,
+        roomId,
+        createdAt: addDays(new Date(startTime), -3).toISOString()
+      });
+      
+      id++;
+    }
+  }
+  
+  // Add a few cancelled and no-show bookings
+  for (let i = 0; i < 10; i++) {
+    const randomIndex = Math.floor(Math.random() * bookings.length);
+    if (i < 5) {
+      bookings[randomIndex].status = 'cancelled';
+    } else {
+      bookings[randomIndex].status = 'no-show';
+    }
   }
   
   return bookings;
 };
 
+// Generate the demo bookings
 const existingBookings = generateDemoBookings();
 
 const SpaBookingPage = () => {
@@ -151,30 +209,25 @@ const SpaBookingPage = () => {
   const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'couples'>('all');
   const [isCustomBooking, setIsCustomBooking] = useState(false);
   
-  // Filter bookings for the selected date
   const filteredBookings = existingBookings.filter(booking => 
     isSameDay(parseISO(booking.startTime), selectedDate)
   );
 
-  // Handle service selection
   const handleServiceSelect = (service: SpaService) => {
     setSelectedService(service);
     setSelectedDuration(service.durations[0]); // Default to first duration
   };
 
-  // Handle duration selection
   const handleDurationSelect = (duration: SpaServiceDuration) => {
     setSelectedDuration(duration);
   };
 
-  // Handle date change
   const handleDateChange = (date: Date | undefined) => {
     if (date) {
       setSelectedDate(date);
     }
   };
 
-  // Handle custom booking
   const handleCustomBooking = () => {
     setIsCustomBooking(true);
     setSelectedTimeSlot(selectedDate.toISOString()); // Use selected date as default
@@ -183,14 +236,12 @@ const SpaBookingPage = () => {
     setIsBookingModalOpen(true);
   };
 
-  // Handle time slot selection
   const handleTimeSlotSelect = (timeSlot: string) => {
     setIsCustomBooking(false);
     setSelectedTimeSlot(timeSlot);
     setIsBookingModalOpen(true);
   };
   
-  // Handle booking submission
   const handleBookingSubmit = (bookingData: any) => {
     console.log('Booking submitted:', bookingData);
     toast({
@@ -221,7 +272,6 @@ const SpaBookingPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left column - Service Selection */}
           <div className="space-y-6 lg:col-span-1">
             <Card className="h-full">
               <CardHeader>
@@ -247,7 +297,6 @@ const SpaBookingPage = () => {
             </Card>
           </div>
 
-          {/* Right column - Calendar */}
           <div className="lg:col-span-2">
             <Card className="h-full">
               <CardHeader>
@@ -269,7 +318,7 @@ const SpaBookingPage = () => {
               </CardHeader>
               <CardContent>
                 <SpaCalendarView 
-                  bookings={filteredBookings}
+                  bookings={existingBookings}
                   services={spaServices}
                   selectedDate={selectedDate}
                   selectedService={selectedService}
