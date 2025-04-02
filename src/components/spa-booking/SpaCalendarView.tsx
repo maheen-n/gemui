@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, addDays, eachHourOfInterval, startOfDay, endOfDay, isSameDay, parseISO, addMinutes, isBefore, isAfter, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -9,6 +8,7 @@ import { ChevronLeft, ChevronRight, Clock, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SpaBooking, SpaService, SpaServiceDuration } from '@/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import type { DayContentProps } from 'react-day-picker';
 
 interface SpaCalendarViewProps {
   bookings: SpaBooking[];
@@ -34,12 +34,10 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
   const [selectedBooking, setSelectedBooking] = useState<SpaBooking | null>(null);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   
-  // Business hours: 9 AM to 7 PM
   const START_HOUR = 9;
   const END_HOUR = 19;
   const PEAK_HOURS = [10, 11, 16, 17]; // 10 AM - 12 PM and 4 PM - 6 PM are peak hours
   
-  // Generate time slots for the selected day
   const generateTimeSlots = (date: Date, service: SpaService | null, duration: SpaServiceDuration | null) => {
     if (!service || !duration) return [];
     
@@ -50,19 +48,15 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
     const dayEnd = new Date(date);
     dayEnd.setHours(END_HOUR, 0, 0, 0);
     
-    // Generate slots at 30-minute intervals
     for (let time = dayStart; time < dayEnd; time = addMinutes(time, 30)) {
       const slotEnd = addMinutes(time, duration.minutes);
       
-      // Skip if the slot goes beyond business hours
       if (isAfter(slotEnd, dayEnd)) continue;
       
-      // Check if the slot overlaps with any existing booking
       const isOverlapping = bookings.some(booking => {
         const bookingStart = parseISO(booking.startTime);
         const bookingEnd = parseISO(booking.endTime);
         
-        // Include preparation time after the booking
         const bookingEndWithPrep = addMinutes(
           bookingEnd, 
           services.find(s => s.id === booking.serviceId)?.preparationTime || 0
@@ -90,7 +84,6 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
   
   const timeSlots = generateTimeSlots(selectedDate, selectedService, selectedDuration);
 
-  // Handle navigation between days
   const handlePrevDay = () => {
     onDateChange(addDays(selectedDate, -1));
   };
@@ -99,13 +92,11 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
     onDateChange(addDays(selectedDate, 1));
   };
 
-  // Handle booking click
   const handleBookingClick = (booking: SpaBooking) => {
     setSelectedBooking(booking);
     setIsPopoverOpen(true);
   };
 
-  // Close booking details
   const handleCloseBookingDetails = () => {
     setIsPopoverOpen(false);
     setSelectedBooking(null);
@@ -398,12 +389,28 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
       isSameDay(parseISO(booking.startTime), selectedDate)
     ).sort((a, b) => parseISO(a.startTime).getTime() - parseISO(b.startTime).getTime());
     
-    // Create a map of dates with bookings
     const bookingDates = bookings.reduce((acc: Record<string, number>, booking) => {
       const dateStr = format(parseISO(booking.startTime), 'yyyy-MM-dd');
       acc[dateStr] = (acc[dateStr] || 0) + 1;
       return acc;
     }, {});
+
+    const CustomDayContent = (props: DayContentProps) => {
+      const { date, ...rest } = props;
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const count = bookingDates[dateStr] || 0;
+
+      return (
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div {...rest} />
+          {count > 0 && (
+            <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-[8px] font-bold text-primary">
+              {count}
+            </span>
+          )}
+        </div>
+      );
+    };
 
     return (
       <div className="space-y-6">
@@ -426,20 +433,7 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
               },
             }}
             components={{
-              DayContent: ({ date, ...props }) => {
-                const dateStr = format(date, 'yyyy-MM-dd');
-                const count = bookingDates[dateStr] || 0;
-                return (
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <div {...props} />
-                    {count > 0 && (
-                      <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-[8px] font-bold text-primary">
-                        {count}
-                      </span>
-                    )}
-                  </div>
-                );
-              },
+              DayContent: CustomDayContent
             }}
           />
         </div>
