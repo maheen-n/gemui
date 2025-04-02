@@ -24,7 +24,25 @@ import {
   ChevronRight,
   ChevronDown,
   Flower2,
-  Sparkles
+  Sparkles,
+  Hotel,
+  ConciergeBell,
+  Utensils,
+  Pool,
+  Bell,
+  Building2,
+  ClipboardCheck,
+  Receipt,
+  Key,
+  Mail,
+  Phone,
+  Star,
+  Heart,
+  Shield,
+  CreditCard,
+  FileSpreadsheet,
+  Settings2,
+  DoorOpen
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MobileMenu } from './MobileMenu';
@@ -123,26 +141,26 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const navItems: NavItem[] = [
-    { to: '/dashboard', icon: Home, label: 'Home' },
-    { to: '/logbook', icon: BookOpen, label: 'Logbook' },
+    { to: '/dashboard', icon: Hotel, label: 'Home' },
+    { to: '/logbook', icon: ClipboardCheck, label: 'Logbook' },
     { to: '/documents', icon: FileText, label: 'Documents' },
     { to: '/collaboration', icon: Users2, label: 'Collaboration' },
-    { to: '/guest-management', icon: User, label: 'Guest Management', children: [
-      { to: '/room-planning', icon: CalendarRange, label: 'Room Planning' },
+    { to: '/guest-management', icon: ConciergeBell, label: 'Guest Management', children: [
+      { to: '/room-planning', icon: BedDouble, label: 'Room Planning' },
       { to: '/guest-management/reservations', icon: Calendar, label: 'Reservations' },
       { to: '/guest-management/spa-booking', icon: Sparkles, label: 'Spa Booking' },
       { to: '/guest-profiles', icon: Users, label: 'Guest Profiles' },
-      { to: '/loyalty-transactions', icon: Wallet, label: 'Loyalty Transactions' },
+      { to: '/loyalty-transactions', icon: CreditCard, label: 'Loyalty Transactions' },
       { to: '/segments', icon: Users2, label: 'Segments' }
     ]},
-    { to: '/guest-experience', icon: MessageSquare, label: 'Guest Experience' },
-    { to: '/operations', icon: Wrench, label: 'Operations', children: [
+    { to: '/guest-experience', icon: Star, label: 'Guest Experience' },
+    { to: '/operations', icon: Building2, label: 'Operations', children: [
       { to: '/work-orders', icon: Wrench, label: 'Work Orders' },
-      { to: '/lost-found', icon: ShoppingBag, label: 'Lost & Found' }
+      { to: '/lost-found', icon: Key, label: 'Lost & Found' }
     ]},
-    { to: '/quality-compliance', icon: ClipboardList, label: 'Quality & Compliance' },
-    { to: '/financials', icon: BarChart3, label: 'Financials' },
-    { to: '/settings', icon: Cog, label: 'Settings' }
+    { to: '/quality-compliance', icon: Shield, label: 'Quality & Compliance' },
+    { to: '/financials', icon: FileSpreadsheet, label: 'Financials' },
+    { to: '/settings', icon: Settings2, label: 'Settings' }
   ];
 
   return (
@@ -154,7 +172,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         }`}
       >
         <div className={`px-4 py-4 flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-between'} border-b border-[#1e2841]`}>
-          {!isSidebarCollapsed && <h1 className="text-xl font-bold text-white">Hotel Harmony</h1>}
+          {!isSidebarCollapsed && <h1 className="text-xl font-bold text-white">Harmony</h1>}
           {isSidebarCollapsed ? (
             <ThemeToggle />
           ) : (

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M16 2L4 8L16 14L28 8L16 2Z" fill="hsl(215, 70%, 40%)"/>
+  <path d="M4 8L16 14V30L4 24V8Z" fill="hsl(215, 70%, 35%)"/>
+  <path d="M28 8L16 14V30L28 24V8Z" fill="hsl(215, 70%, 45%)"/>
+  <path d="M16 14L4 8L16 2L28 8L16 14Z" fill="hsl(215, 70%, 50%)"/>
+</svg> 
