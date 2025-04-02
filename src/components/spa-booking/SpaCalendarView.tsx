@@ -395,14 +395,14 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
       return acc;
     }, {});
 
-    const CustomDayContent = (props: DayContentProps) => {
-      const { date, ...rest } = props;
+    const CustomDayContent = (dayProps: DayContentProps) => {
+      const { date, displayMonth, selected, disabled, hidden, activeModifiers, ...rest } = dayProps;
       const dateStr = format(date, 'yyyy-MM-dd');
       const count = bookingDates[dateStr] || 0;
 
       return (
         <div className="relative w-full h-full flex items-center justify-center">
-          <div {...rest} />
+          <div>{dayProps.children}</div>
           {count > 0 && (
             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-[8px] font-bold text-primary">
               {count}
