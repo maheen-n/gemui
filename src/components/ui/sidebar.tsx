@@ -19,8 +19,8 @@ export function Sidebar({
   footer,
   collapsible = false,
   defaultCollapsed = false,
-  width = "w-60", // Changed from w-52 to w-60 for a better experience
-  collapsedWidth = "w-16", // Changed from w-14 to w-16 for better icon display
+  width = "w-72", // Changed from w-60 to w-72 for more space
+  collapsedWidth = "w-16", // Unchanged
   ...props
 }: SidebarProps) {
   const [collapsed, setCollapsed] = React.useState(defaultCollapsed);

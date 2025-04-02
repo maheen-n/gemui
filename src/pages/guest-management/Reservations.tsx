@@ -7,7 +7,6 @@ import {
   CardContent, 
   CardHeader, 
   CardTitle, 
-  CardDescription 
 } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +32,6 @@ import {
   X, 
   Eye, 
   Calendar,
-  ArrowRight,
   UserCircle,
   Phone,
   Mail,
@@ -42,6 +40,9 @@ import {
   CalendarClock,
   HomeIcon,
   Users2,
+  CheckCircle,
+  Pencil,
+  LogOutIcon,
 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -49,6 +50,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Reservation } from '@/types';
+import { toast } from "@/hooks/use-toast";
 
 interface ExtendedReservation extends Reservation {
   serialNumber: string;
@@ -84,10 +86,11 @@ interface ExtendedReservation extends Reservation {
   sourceCode?: string;
 }
 
+// Enhanced dummy data with multiple rooms per reservation
 const guestReservationsData: ExtendedReservation[] = [
   {
     id: "42751-2425",
-    reservationNumber: "42751-2425-1",
+    reservationNumber: "42751-2425",
     guestName: "MR. RAFEEQ ALI",
     checkIn: "2025-03-30",
     checkOut: "2025-03-31",
@@ -95,7 +98,7 @@ const guestReservationsData: ExtendedReservation[] = [
     entityCode: "CH",
     roomTypeId: "1",
     pax: 2,
-    status: "confirmed",
+    status: "booking", // Status is booking - should appear in arrivals
     createdAt: "2025-03-20",
     booker: {
       name: "RAFEEQ ALI",
@@ -113,7 +116,7 @@ const guestReservationsData: ExtendedReservation[] = [
         lengthOfStay: 1,
         totalAmount: 0.0,
         status: "booking",
-        mainGuest: false,
+        mainGuest: true,
         adultCount: 2,
         childCount: 2,
         mealPlan: "CP",
@@ -123,12 +126,11 @@ const guestReservationsData: ExtendedReservation[] = [
     ],
     totalAmount: 5206.0,
     currency: "INR",
-    displayName: "MR. RAFEEQ ALI",
-    sourceCode: "20   "
+    displayName: "MR. RAFEEQ ALI"
   },
   {
     id: "39433-2425",
-    reservationNumber: "39433-2425-1",
+    reservationNumber: "39433-2425",
     guestName: "Deeplakshmi Avadhoot Joshi",
     checkIn: "2025-03-30",
     checkOut: "2025-07-31",
@@ -136,7 +138,7 @@ const guestReservationsData: ExtendedReservation[] = [
     entityCode: "CH",
     roomTypeId: "1",
     pax: 2,
-    status: "confirmed",
+    status: "checked-in", // Status is checked-in - should appear in inhouse
     createdAt: "2025-03-20",
     rooms: [
       {
@@ -148,11 +150,28 @@ const guestReservationsData: ExtendedReservation[] = [
         lastName: "Joshi",
         lengthOfStay: 123,
         totalAmount: 2500.0,
-        status: "booking",
+        status: "checked-in", // Room is checked in
         mainGuest: true,
         adultCount: 2,
         childCount: 0,
         mealPlan: "MAP",
+        checkInTime: 1743582600000,
+        checkOutTime: 1754458200000
+      },
+      {
+        subReservationId: "39433-2425-2",
+        serialNumber: "02",
+        type: "Suite Room",
+        title: "MR.",
+        firstName: "Avadhoot",
+        lastName: "Joshi",
+        lengthOfStay: 123,
+        totalAmount: 3500.0,
+        status: "booking", // This room is still in booking status
+        mainGuest: false,
+        adultCount: 1,
+        childCount: 0,
+        mealPlan: "AP",
         checkInTime: 1743582600000,
         checkOutTime: 1754458200000
       }
@@ -162,15 +181,15 @@ const guestReservationsData: ExtendedReservation[] = [
   },
   {
     id: "42692-2425",
-    reservationNumber: "42692-2425-1",
+    reservationNumber: "42692-2425",
     guestName: "NITISH GUPTA",
-    checkIn: "2025-03-30",
-    checkOut: "2025-03-31",
+    checkIn: "2025-03-29",
+    checkOut: "2025-03-30", // Due out today
     serialNumber: "01",
     entityCode: "CH",
     roomTypeId: "1",
     pax: 1,
-    status: "confirmed",
+    status: "checked-in", // Status is checked-in and checkout is today - should appear in due out
     createdAt: "2025-03-20",
     rooms: [
       {
@@ -182,13 +201,13 @@ const guestReservationsData: ExtendedReservation[] = [
         lastName: "GUPTA",
         lengthOfStay: 1,
         totalAmount: 3500.0,
-        status: "booking",
+        status: "checked-in",
         mainGuest: true,
         adultCount: 1,
         childCount: 0,
         mealPlan: "EP",
-        checkInTime: 1743582600000,
-        checkOutTime: 1743658200000
+        checkInTime: 1743496200000, // Yesterday
+        checkOutTime: 1743582600000 // Today's date
       }
     ],
     totalAmount: 3500.0,
@@ -196,15 +215,15 @@ const guestReservationsData: ExtendedReservation[] = [
   },
   {
     id: "20449-2425",
-    reservationNumber: "20449-2425-1",
+    reservationNumber: "20449-2425",
     guestName: "LAMPH",
     checkIn: "2025-03-30",
     checkOut: "2025-04-03",
     serialNumber: "02",
     entityCode: "MB",
     roomTypeId: "2",
-    pax: 1,
-    status: "confirmed",
+    pax: 3,
+    status: "booking", // Status is booking - should appear in arrivals
     createdAt: "2025-03-20",
     rooms: [
       {
@@ -223,22 +242,39 @@ const guestReservationsData: ExtendedReservation[] = [
         mealPlan: "AP",
         checkInTime: 1743582600000,
         checkOutTime: 1743917400000
+      },
+      {
+        subReservationId: "20449-2425-2",
+        serialNumber: "02",
+        type: "Deluxe Room",
+        title: "MR.",
+        firstName: "JOHN",
+        lastName: "DOE",
+        lengthOfStay: 4,
+        totalAmount: 8000.0,
+        status: "booking",
+        mainGuest: false,
+        adultCount: 2,
+        childCount: 0,
+        mealPlan: "CP",
+        checkInTime: 1743582600000,
+        checkOutTime: 1743917400000
       }
     ],
-    totalAmount: 12000.0,
+    totalAmount: 20000.0,
     currency: "USD"
   },
   {
     id: "38328-2425",
-    reservationNumber: "38328-2425-1",
+    reservationNumber: "38328-2425",
     guestName: "HANNAH HORSHAM",
-    checkIn: "2025-03-30",
+    checkIn: "2025-03-29", // Yesterday
     checkOut: "2025-04-04",
     serialNumber: "01",
     entityCode: "MB",
     roomTypeId: "3",
-    pax: 2,
-    status: "confirmed",
+    pax: 4,
+    status: "checked-in", // Status is checked in - should appear in in-house
     createdAt: "2025-03-20",
     rooms: [
       {
@@ -250,16 +286,33 @@ const guestReservationsData: ExtendedReservation[] = [
         lastName: "HORSHAM",
         lengthOfStay: 5,
         totalAmount: 15000.0,
-        status: "booking",
+        status: "checked-in",
         mainGuest: true,
         adultCount: 2,
         childCount: 0,
         mealPlan: "MAP",
-        checkInTime: 1743582600000,
+        checkInTime: 1743496200000, // Yesterday
+        checkOutTime: 1744003800000
+      },
+      {
+        subReservationId: "38328-2425-2",
+        serialNumber: "02",
+        type: "Executive Room",
+        title: "MR.",
+        firstName: "JAMES",
+        lastName: "HORSHAM",
+        lengthOfStay: 5,
+        totalAmount: 13500.0,
+        status: "checked-in",
+        mainGuest: false,
+        adultCount: 1,
+        childCount: 1,
+        mealPlan: "MAP",
+        checkInTime: 1743496200000, // Yesterday
         checkOutTime: 1744003800000
       }
     ],
-    totalAmount: 15000.0,
+    totalAmount: 28500.0,
     currency: "EUR"
   }
 ];
@@ -274,24 +327,32 @@ const Reservations = () => {
 
   const getFilteredGuests = () => {
     let filtered = guestReservationsData;
+    const today = selectedDate;
 
     // Filter based on view type
     switch (viewType) {
       case 'arrival':
+        // Show reservations with status "booking" and check-in date is today
         filtered = filtered.filter(guest => 
-          format(new Date(guest.checkIn), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+          guest.status === 'booking' &&
+          format(new Date(guest.checkIn), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
         );
         break;
       case 'inhouse':
+        // Show reservations with status "checked-in" and check-out date is after today
         filtered = filtered.filter(guest => {
           const checkIn = new Date(guest.checkIn);
           const checkOut = new Date(guest.checkOut);
-          return checkIn <= selectedDate && checkOut > selectedDate;
+          return guest.status === 'checked-in' && 
+                 checkIn <= today && 
+                 checkOut > today;
         });
         break;
       case 'dueout':
+        // Show reservations with status "checked-in" and check-out date is today
         filtered = filtered.filter(guest => 
-          format(new Date(guest.checkOut), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+          guest.status === 'checked-in' &&
+          format(new Date(guest.checkOut), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
         );
         break;
       // 'all' case doesn't need filtering
@@ -342,7 +403,7 @@ const Reservations = () => {
     switch(status.toLowerCase()) {
       case 'confirmed':
       case 'booking':
-        return <Badge className="bg-blue-500 text-white hover:bg-blue-600">Confirmed</Badge>;
+        return <Badge className="bg-blue-500 text-white hover:bg-blue-600">Booking</Badge>;
       case 'checked-in':
         return <Badge className="bg-green-500 text-white hover:bg-green-600">Checked In</Badge>;
       case 'checked-out':
@@ -354,6 +415,27 @@ const Reservations = () => {
       default:
         return <Badge>{status}</Badge>;
     }
+  };
+
+  const handleCheckIn = (roomId: string) => {
+    toast({
+      title: "Room checked in",
+      description: `Room ${roomId} has been checked in successfully.`,
+    });
+  };
+
+  const handleCheckOut = (roomId: string) => {
+    toast({
+      title: "Room checked out",
+      description: `Room ${roomId} has been checked out successfully.`,
+    });
+  };
+
+  const handleEditDetails = (roomId: string) => {
+    toast({
+      title: "Edit room details",
+      description: `Editing details for room ${roomId}.`,
+    });
   };
 
   return (
@@ -472,7 +554,7 @@ const Reservations = () => {
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="font-mono">#{reservation.reservationNumber}</Badge>
+                                <Badge variant="outline" className="font-mono">{reservation.id}</Badge>
                                 {getStatusBadge(reservation.status)}
                                 {reservation.booker?.agentName && (
                                   <Badge variant="secondary">
@@ -488,12 +570,16 @@ const Reservations = () => {
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <HomeIcon className="h-3.5 w-3.5" />
-                                  <span>{reservation.rooms?.[0].type}</span>
+                                  <span>
+                                    {reservation.rooms?.length} {reservation.rooms?.length === 1 ? 'Room' : 'Rooms'}
+                                    {reservation.rooms?.[0] && ` (${reservation.rooms[0].type}${reservation.rooms.length > 1 ? ', ...' : ''})`}
+                                  </span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Users2 className="h-3.5 w-3.5" />
                                   <span>
-                                    {reservation.rooms?.[0].adultCount || 0} Adults, {reservation.rooms?.[0].childCount || 0} Children
+                                    {reservation.rooms?.reduce((acc, room) => acc + room.adultCount, 0) || 0} Adults, 
+                                    {reservation.rooms?.reduce((acc, room) => acc + room.childCount, 0) || 0} Children
                                   </span>
                                 </div>
                                 {reservation.totalAmount && (
@@ -545,7 +631,7 @@ const Reservations = () => {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
                 Reservation Details
-                <Badge className="ml-2">#{selectedReservation?.reservationNumber}</Badge>
+                <Badge className="ml-2">{selectedReservation?.id}</Badge>
               </DialogTitle>
               <DialogDescription>
                 View and manage reservation information
@@ -560,10 +646,9 @@ const Reservations = () => {
                   onValueChange={setActiveTab}
                   className="h-full flex flex-col"
                 >
-                  <TabsList className="grid grid-cols-3 mb-4">
+                  <TabsList className="grid grid-cols-2 mb-4">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="rooms">Rooms & Guests</TabsTrigger>
-                    <TabsTrigger value="billing">Billing</TabsTrigger>
                   </TabsList>
                   
                   <div className="flex-1 overflow-y-auto">
@@ -672,13 +757,6 @@ const Reservations = () => {
                                       <p className="text-xs text-muted-foreground">Booked On</p>
                                       <p className="font-medium">
                                         {selectedReservation.createdAt ? format(new Date(selectedReservation.createdAt), 'MMM d, yyyy') : 'N/A'}
-                                      </p>
-                                    </div>
-                                    
-                                    <div>
-                                      <p className="text-xs text-muted-foreground">Source Code</p>
-                                      <p className="font-medium">
-                                        {selectedReservation.sourceCode?.trim() || 'N/A'}
                                       </p>
                                     </div>
                                   </div>
@@ -818,16 +896,34 @@ const Reservations = () => {
                                 
                                 <div className="mt-4 flex justify-end gap-2">
                                   {room.status === 'booking' && (
-                                    <Button variant="default" size="sm">
+                                    <Button 
+                                      variant="default" 
+                                      size="sm" 
+                                      onClick={() => handleCheckIn(room.subReservationId)}
+                                      className="flex items-center gap-1.5"
+                                    >
+                                      <CheckCircle className="h-3.5 w-3.5" />
                                       Check In
                                     </Button>
                                   )}
                                   {room.status === 'checked-in' && (
-                                    <Button variant="default" size="sm">
+                                    <Button 
+                                      variant="default" 
+                                      size="sm"
+                                      onClick={() => handleCheckOut(room.subReservationId)}
+                                      className="flex items-center gap-1.5"
+                                    >
+                                      <LogOutIcon className="h-3.5 w-3.5" />
                                       Check Out
                                     </Button>
                                   )}
-                                  <Button variant="outline" size="sm">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => handleEditDetails(room.subReservationId)}
+                                    className="flex items-center gap-1.5"
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
                                     Edit Details
                                   </Button>
                                 </div>
@@ -837,66 +933,18 @@ const Reservations = () => {
                         </CardContent>
                       </Card>
                     </TabsContent>
-                    
-                    <TabsContent value="billing" className="mt-0">
-                      <Card className="border-none shadow-none">
-                        <CardContent className="p-0">
-                          <div className="space-y-6">
-                            <div>
-                              <h3 className="font-medium mb-3">Payment Summary</h3>
-                              
-                              <Card>
-                                <CardContent className="p-4">
-                                  <div className="space-y-4">
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-muted-foreground">Room charges</span>
-                                      <span>{selectedReservation.totalAmount?.toLocaleString()} {selectedReservation.currency}</span>
-                                    </div>
-                                    
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-muted-foreground">Taxes & Fees</span>
-                                      <span>Included</span>
-                                    </div>
-                                    
-                                    <Separator />
-                                    
-                                    <div className="flex justify-between items-center font-medium text-lg">
-                                      <span>Total</span>
-                                      <span>{selectedReservation.totalAmount?.toLocaleString()} {selectedReservation.currency}</span>
-                                    </div>
-                                    
-                                    <div className="mt-4">
-                                      <Button className="w-full sm:w-auto">Process Payment</Button>
-                                    </div>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            </div>
-                            
-                            <div>
-                              <h3 className="font-medium mb-3">Payment History</h3>
-                              
-                              <Card className="bg-muted/10">
-                                <CardContent className="p-6 text-center">
-                                  <p className="text-muted-foreground">
-                                    No payment transactions recorded for this reservation yet.
-                                  </p>
-                                </CardContent>
-                              </Card>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
                   </div>
                 </Tabs>
               </div>
             )}
             
             <div className="flex justify-end gap-2 pt-4">
-              {selectedReservation?.status.toLowerCase() === 'confirmed' && (
-                <Button>
-                  Check In Guest
+              {selectedReservation?.status.toLowerCase() === 'booking' && (
+                <Button onClick={() => toast({
+                  title: "Reservation checked in",
+                  description: `All rooms for reservation ${selectedReservation.id} have been checked in.`
+                })}>
+                  Check In All Rooms
                 </Button>
               )}
               <Button variant="outline" onClick={() => setIsDetailModalOpen(false)}>
