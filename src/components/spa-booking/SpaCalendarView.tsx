@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { format } from 'date-fns';
+import { type DayContentProps } from 'react-day-picker';
+
 import { format, addDays, eachHourOfInterval, startOfDay, endOfDay, isSameDay, parseISO, addMinutes, isBefore, isAfter, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
@@ -8,7 +11,6 @@ import { ChevronLeft, ChevronRight, Clock, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SpaBooking, SpaService, SpaServiceDuration } from '@/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { type DayContentProps } from 'react-day-picker';
 
 interface SpaCalendarViewProps {
   bookings: SpaBooking[];
@@ -395,14 +397,13 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
       return acc;
     }, {});
 
-    const CustomDayContent = (props: DayContentProps) => {
-      const { date } = props;
+    const CustomDayContent = ({ date }: DayContentProps) => {
       const dateStr = format(date, 'yyyy-MM-dd');
       const count = bookingDates[dateStr] || 0;
 
       return (
         <div className="relative w-full h-full flex items-center justify-center">
-          <div>{props.content}</div>
+          <div>{date.getDate()}</div>
           {count > 0 && (
             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-[8px] font-bold text-primary">
               {count}
