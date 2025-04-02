@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -160,11 +159,10 @@ export interface Reservation {
   checkOut: string;
   roomTypeId: string;
   roomNumber?: string;
-  status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
 }
 
-// New types for SPA Booking
 export interface SpaService {
   id: string;
   name: string;

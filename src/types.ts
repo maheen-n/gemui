@@ -1,3 +1,4 @@
+
 // Add missing types related to SpaBooking functionality
 
 export interface Room {
@@ -66,7 +67,7 @@ export interface Reservation {
   checkOut: string;
   roomTypeId: string;
   roomNumber?: string;
-  status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
 }
 
