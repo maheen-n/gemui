@@ -135,14 +135,14 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
                               </div>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleViewReservationDetails(reservation)}>
+                                <Eye className="h-3.5 w-3.5 mr-2" /> View Details
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => {
                                 setSelectedReservation(reservation);
                                 setShowModal(true);
                               }}>
                                 Assign Room
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleViewReservationDetails(reservation)}>
-                                <Eye className="h-3.5 w-3.5 mr-2" /> View Details
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

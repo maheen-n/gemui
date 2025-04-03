@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -26,12 +25,14 @@ import {
   ArrowLeft,
   Pencil,
   Clock,
-  DollarSign
+  DollarSign,
+  MessageSquare,
+  FileText,
+  Building2
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-// Define the extended reservation type
 interface ExtendedReservation {
   id: string;
   reservationNumber: string;
@@ -74,24 +75,23 @@ interface ExtendedReservation {
   displayName?: string;
 }
 
-// Dummy data to display
 const guestReservationsData: ExtendedReservation[] = [
   {
     id: "42751-2425",
     reservationNumber: "42751-2425",
-    guestName: "MR. RAFEEQ ALI",
+    guestName: "MICHAEL GROUP",
     checkIn: "2025-03-30",
     checkOut: "2025-03-31",
     serialNumber: "01",
-    entityCode: "CH",
+    entityCode: "SV",
     roomTypeId: "1",
-    pax: 2,
+    pax: 8,
     status: "booking",
     createdAt: "2025-03-20",
     booker: {
-      name: "RAFEEQ ALI",
-      email: "p2htwvekox@m.expediapartnercentral.com",
-      phone: "+919714357520",
+      name: "MICHAEL GROUP",
+      email: "inbound1@intersight.in",
+      phone: "+919148433210008",
       agentCode: "A2439",
       agentName: "EXPEDIA TRAVEL"
     },
@@ -101,22 +101,73 @@ const guestReservationsData: ExtendedReservation[] = [
         serialNumber: "01",
         type: "Executive Room",
         title: "MR.",
-        firstName: "RAFEEQ",
-        lastName: "ALI",
+        firstName: "Juzer",
+        lastName: "",
         lengthOfStay: 1,
-        totalAmount: 5206.0,
+        totalAmount: 61320.0,
         status: "booking",
         mainGuest: true,
         adultCount: 2,
-        childCount: 2,
+        childCount: 0,
+        mealPlan: "CP",
+        checkInTime: 1743582600000,
+        checkOutTime: 1743658200000
+      },
+      {
+        subReservationId: "42751-2425-2",
+        serialNumber: "02",
+        type: "Executive Room",
+        title: "MR.",
+        firstName: "Juzer",
+        lastName: "",
+        lengthOfStay: 1,
+        totalAmount: 61320.0,
+        status: "booking",
+        mainGuest: false,
+        adultCount: 2,
+        childCount: 0,
+        mealPlan: "CP",
+        checkInTime: 1743582600000,
+        checkOutTime: 1743658200000
+      },
+      {
+        subReservationId: "42751-2425-3",
+        serialNumber: "03",
+        type: "Executive Room",
+        title: "MR.",
+        firstName: "Juzer",
+        lastName: "",
+        lengthOfStay: 1,
+        totalAmount: 61320.0,
+        status: "booking",
+        mainGuest: false,
+        adultCount: 2,
+        childCount: 0,
+        mealPlan: "CP",
+        checkInTime: 1743582600000,
+        checkOutTime: 1743658200000
+      },
+      {
+        subReservationId: "42751-2425-4",
+        serialNumber: "04",
+        type: "Executive Room",
+        title: "MR.",
+        firstName: "Juzer",
+        lastName: "",
+        lengthOfStay: 1,
+        totalAmount: 61320.0,
+        status: "booking",
+        mainGuest: false,
+        adultCount: 2,
+        childCount: 0,
         mealPlan: "CP",
         checkInTime: 1743582600000,
         checkOutTime: 1743658200000
       }
     ],
-    totalAmount: 5206.0,
+    totalAmount: 245280.0,
     currency: "INR",
-    displayName: "MR. RAFEEQ ALI"
+    displayName: "MICHAEL GROUP"
   },
   {
     id: "20449-2425",
@@ -226,11 +277,10 @@ const ReservationDetails = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>('overview');
+  const [activeTab, setActiveTab] = useState<string>('rooms');
   const [reservation, setReservation] = useState<ExtendedReservation | null>(null);
   
   useEffect(() => {
-    // In a real app, this would be an API call
     const foundReservation = guestReservationsData.find(res => res.id === id);
     if (foundReservation) {
       setReservation(foundReservation);
@@ -268,7 +318,7 @@ const ReservationDetails = () => {
   };
   
   const formatTimestamp = (timestamp: number) => {
-    return format(new Date(timestamp), 'MMM dd, yyyy hh:mm a');
+    return format(new Date(timestamp), 'dd MMM, yyyy hh:mm a');
   };
   
   const getStatusBadge = (status: string) => {
@@ -311,7 +361,6 @@ const ReservationDetails = () => {
   };
   
   const handleGoBack = () => {
-    // Check if we were referred from room planning
     if (location.state?.from === 'room-planning') {
       navigate('/room-planning');
     } else {
@@ -321,376 +370,274 @@ const ReservationDetails = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 pb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <Button 
-              variant="outline" 
-              onClick={handleGoBack}
-              className="mb-2"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
-            </Button>
-            <h1 className="text-3xl font-bold tracking-tight">Reservation Details</h1>
-            <div className="flex items-center gap-2 mt-2">
-              <Badge variant="outline" className="font-mono text-base">{reservation.id}</Badge>
-              {getStatusBadge(reservation.status)}
-            </div>
-          </div>
-          
-          {reservation.status === 'booking' && (
-            <Button 
-              onClick={() => toast({
-                title: "Reservation checked in",
-                description: `All rooms for reservation ${reservation.id} have been checked in.`
-              })}
-            >
-              <CheckCircle className="mr-2 h-4 w-4" /> Check In All Rooms
-            </Button>
-          )}
-        </div>
+      <div className="p-6">
+        <Button 
+          variant="outline" 
+          onClick={handleGoBack}
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+        </Button>
         
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="rooms">Rooms & Guests</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <UserCircle className="h-5 w-5 text-muted-foreground" />
-                    Guest Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="bg-primary/10 rounded-full p-3">
-                      <UserCircle className="h-8 w-8 text-primary" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-lg">{reservation.guestName}</h4>
-                      <p className="text-muted-foreground text-sm">
-                        {reservation.rooms?.[0]?.title} {reservation.rooms?.[0]?.firstName} {reservation.rooms?.[0]?.lastName}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {reservation.booker?.agentName && (
-                      <div className="col-span-full">
-                        <p className="text-xs text-muted-foreground">Booked Via</p>
-                        <p className="font-medium flex items-center gap-1">
-                          <Badge variant="outline">{reservation.booker.agentCode}</Badge>
-                          {reservation.booker.agentName}
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div>
-                      <p className="text-xs text-muted-foreground">Email</p>
-                      <p className="font-medium flex items-center gap-1">
-                        <Mail className="h-3.5 w-3.5 text-muted-foreground" />
-                        {reservation.booker?.email || "Not provided"}
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-xs text-muted-foreground">Phone</p>
-                      <p className="font-medium flex items-center gap-1">
-                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                        {reservation.booker?.phone || "Not provided"}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                    Reservation Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-muted-foreground">Status</div>
-                    <div>{getStatusBadge(reservation.status)}</div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-muted-foreground">Check-in Date</div>
-                    <div className="font-medium flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-green-500" />
-                      {format(new Date(reservation.checkIn), 'MMM d, yyyy')}
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-muted-foreground">Check-out Date</div>
-                    <div className="font-medium flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-red-500" />
-                      {format(new Date(reservation.checkOut), 'MMM d, yyyy')}
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-muted-foreground">Length of Stay</div>
-                    <div className="font-medium">
-                      {reservation.rooms?.[0]?.lengthOfStay || 1} {(reservation.rooms?.[0]?.lengthOfStay || 1) > 1 ? 'nights' : 'night'}
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-muted-foreground">Total Amount</div>
-                    <div className="font-medium text-lg">
-                      {reservation.totalAmount?.toLocaleString()} {reservation.currency}
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Reservation #</p>
-                      <p className="font-medium">
-                        {reservation.reservationNumber}
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-xs text-muted-foreground">Booked On</p>
-                      <p className="font-medium">
-                        {reservation.createdAt ? format(new Date(reservation.createdAt), 'MMM d, yyyy') : 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BedDouble className="h-5 w-5 text-muted-foreground" />
-                  Room Summary
+              <CardHeader className="pb-2">
+                <CardTitle className="text-2xl font-bold flex items-center justify-between">
+                  <div>
+                    {reservation.displayName || reservation.guestName}
+                  </div>
+                  <div>
+                    {getStatusBadge(reservation.status)}
+                  </div>
                 </CardTitle>
+                <CardDescription className="flex items-center text-sm">
+                  <span className="font-mono text-muted-foreground">#{reservation.reservationNumber}</span>
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Room ID</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Guest</TableHead>
-                      <TableHead>Guests</TableHead>
-                      <TableHead>Meal Plan</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {reservation.rooms?.map((room) => (
-                      <TableRow key={room.subReservationId}>
-                        <TableCell className="font-medium">
-                          <div className="flex flex-col">
-                            <span>#{room.serialNumber}</span>
-                            <span className="text-xs text-muted-foreground">{room.subReservationId}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{room.type}</TableCell>
-                        <TableCell>
-                          {room.title} {room.firstName} {room.lastName}
-                          {room.mainGuest && (
-                            <Badge variant="secondary" className="ml-1 text-xs">Primary</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {room.adultCount} Adults, {room.childCount} Children
-                        </TableCell>
-                        <TableCell>
-                          <span className="flex gap-1 items-center">
-                            <Badge variant="outline" className="font-mono">{room.mealPlan}</Badge>
-                            <span className="text-xs">{getMealPlanFull(room.mealPlan)}</span>
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {room.totalAmount.toLocaleString()} {reservation.currency}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            {room.status === 'booking' && (
-                              <Button 
-                                variant="default" 
-                                size="sm" 
-                                onClick={() => handleCheckIn(room.subReservationId)}
-                              >
-                                <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                                Check In
-                              </Button>
-                            )}
-                            {room.status === 'checked-in' && (
-                              <Button 
-                                variant="default" 
-                                size="sm"
-                                onClick={() => handleCheckOut(room.subReservationId)}
-                              >
-                                <LogOutIcon className="h-3.5 w-3.5 mr-1" />
-                                Check Out
-                              </Button>
-                            )}
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleEditDetails(room.subReservationId)}
-                            >
-                              <Pencil className="h-3.5 w-3.5 mr-1" />
-                              Edit
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="rooms" className="space-y-6">
-            {reservation.rooms?.map((room, index) => (
-              <Card key={room.subReservationId} className="overflow-hidden">
-                <CardHeader className="bg-muted/20 py-3">
-                  <CardTitle className="text-lg flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Badge variant="outline" className="font-mono">
-                        Room {room.serialNumber}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">(ID: {room.subReservationId})</span>
-                      {room.type}
-                    </span>
-                    {getStatusBadge(room.status)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
-                        <UserCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                        Guest Information
-                      </h4>
-                      <div className="space-y-3 bg-muted/10 p-3 rounded-md">
-                        <div>
-                          <p className="text-xs text-muted-foreground">Name</p>
-                          <p className="font-medium">{room.title} {room.firstName} {room.lastName}</p>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <p className="text-xs text-muted-foreground">Adults</p>
-                            <p className="font-medium">{room.adultCount}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">Children</p>
-                            <p className="font-medium">{room.childCount}</p>
-                          </div>
-                        </div>
-                        
-                        {room.mainGuest && (
-                          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
-                            Primary Guest
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
-                        <BedDouble className="h-3.5 w-3.5 text-muted-foreground" />
-                        Stay Details
-                      </h4>
-                      <div className="space-y-3 bg-muted/10 p-3 rounded-md">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <p className="text-xs text-muted-foreground">Check-in</p>
-                            <p className="font-medium">{formatTimestamp(room.checkInTime)}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">Check-out</p>
-                            <p className="font-medium">{formatTimestamp(room.checkOutTime)}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <p className="text-xs text-muted-foreground">Nights</p>
-                            <p className="font-medium">{room.lengthOfStay}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">Meal Plan</p>
-                            <p className="font-medium flex items-center gap-1">
-                              <Badge variant="outline" className="font-mono">{room.mealPlan}</Badge>
-                              {getMealPlanFull(room.mealPlan)}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <p className="text-xs text-muted-foreground">Room Rate</p>
-                          <p className="font-medium flex items-center gap-1">
-                            <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
-                            {room.totalAmount.toLocaleString()} {reservation.currency}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+              <CardContent className="space-y-4">
+                {reservation.booker?.email && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span>{reservation.booker.email}</span>
+                  </div>
+                )}
+                
+                {reservation.booker?.phone && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span>{reservation.booker.phone}</span>
+                  </div>
+                )}
+                
+                <Separator />
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Check In</p>
+                    <p className="font-medium flex items-center">
+                      <Calendar className="h-3.5 w-3.5 mr-1 text-green-500" />
+                      {format(new Date(reservation.checkIn), 'dd MMM yy')}
+                    </p>
                   </div>
                   
-                  <div className="mt-4 flex justify-end gap-2">
-                    {room.status === 'booking' && (
-                      <Button 
-                        variant="default" 
-                        size="sm" 
-                        onClick={() => handleCheckIn(room.subReservationId)}
-                        className="flex items-center gap-1.5"
-                      >
-                        <CheckCircle className="h-3.5 w-3.5" />
-                        Check In
-                      </Button>
-                    )}
-                    {room.status === 'checked-in' && (
-                      <Button 
-                        variant="default" 
-                        size="sm"
-                        onClick={() => handleCheckOut(room.subReservationId)}
-                        className="flex items-center gap-1.5"
-                      >
-                        <LogOutIcon className="h-3.5 w-3.5" />
-                        Check Out
-                      </Button>
-                    )}
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleEditDetails(room.subReservationId)}
-                      className="flex items-center gap-1.5"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                      Edit Details
+                  <div>
+                    <p className="text-xs text-muted-foreground">Check Out</p>
+                    <p className="font-medium flex items-center">
+                      <Calendar className="h-3.5 w-3.5 mr-1 text-red-500" />
+                      {format(new Date(reservation.checkOut), 'dd MMM yy')}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Length of stay</p>
+                    <p className="font-medium">
+                      {reservation.rooms?.[0]?.lengthOfStay || 1} Night
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-muted-foreground">Total amount</p>
+                    <p className="font-medium">
+                      {reservation.totalAmount?.toLocaleString()} {reservation.currency}
+                    </p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Room Status</p>
+                    <p className="font-medium flex items-center">
+                      <Badge variant="outline" className="rounded-full px-2">
+                        {reservation.rooms?.length || 0}
+                      </Badge>
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-muted-foreground">Serial Number</p>
+                    <p className="font-medium">{reservation.serialNumber}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Entity Code</p>
+                    <p className="font-medium">{reservation.entityCode}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-muted-foreground">PAX</p>
+                    <p className="font-medium flex items-center">
+                      <Users className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                      {reservation.pax}
+                    </p>
+                  </div>
+                </div>
+                
+                {reservation.booker?.agentName && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Booked Via</p>
+                    <p className="font-medium flex items-center gap-2">
+                      <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Badge variant="outline" className="font-mono">
+                        {reservation.booker.agentCode}
+                      </Badge>
+                      {reservation.booker.agentName}
+                    </p>
+                  </div>
+                )}
+                
+                {reservation.status === 'booking' && (
+                  <div className="pt-2">
+                    <Button className="w-full" onClick={() => {
+                      toast({
+                        title: "Reservation checked in",
+                        description: `All rooms for reservation ${reservation.id} have been checked in.`
+                      });
+                    }}>
+                      <CheckCircle className="mr-2 h-4 w-4" /> Check In All Rooms
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </TabsContent>
-        </Tabs>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="lg:col-span-2">
+            <Tabs defaultValue="rooms" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="rooms">Rooms</TabsTrigger>
+                <TabsTrigger value="activity">Activity</TabsTrigger>
+                <TabsTrigger value="communication">Communication</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="rooms" className="mt-4">
+                <Card>
+                  <CardContent className="p-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Room</TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Contact</TableHead>
+                          <TableHead>Arrival / Departure</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="w-10"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {reservation.rooms?.map((room) => (
+                          <TableRow key={room.subReservationId}>
+                            <TableCell>
+                              {room.roomNumber || "-"}
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-medium">
+                                {room.firstName} {room.lastName}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                #{room.subReservationId}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {reservation.booker?.phone || "-"}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="flex items-center text-sm">
+                                  <Calendar className="h-3.5 w-3.5 mr-1 text-green-500" />
+                                  {formatTimestamp(room.checkInTime)}
+                                </span>
+                                <span className="flex items-center text-sm">
+                                  <Calendar className="h-3.5 w-3.5 mr-1 text-red-500" />
+                                  {formatTimestamp(room.checkOutTime)}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {getStatusBadge(room.status)}
+                            </TableCell>
+                            <TableCell>
+                              <Button variant="ghost" size="icon" className="text-blue-500">
+                                <ArrowLeft className="h-4 w-4 rotate-180" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="activity" className="mt-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Activity Log</CardTitle>
+                    <CardDescription>
+                      Recent activities for this reservation
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="border rounded-md p-4">
+                        <div className="flex justify-between mb-2">
+                          <div className="font-medium">Reservation Created</div>
+                          <div className="text-muted-foreground text-sm">
+                            {format(new Date(reservation.createdAt), 'dd MMM yyyy, hh:mm a')}
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Reservation #{reservation.reservationNumber} was created with {reservation.rooms?.length} room(s)
+                        </div>
+                      </div>
+                      
+                      <div className="border rounded-md p-4">
+                        <div className="flex justify-between mb-2">
+                          <div className="font-medium">Payment Received</div>
+                          <div className="text-muted-foreground text-sm">
+                            {format(new Date(reservation.createdAt), 'dd MMM yyyy, hh:mm a')}
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Payment of {reservation.totalAmount?.toLocaleString()} {reservation.currency} received
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="communication" className="mt-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Communication</CardTitle>
+                    <CardDescription>
+                      Messages and communication history
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                      <MessageSquare className="h-10 w-10 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium">No messages yet</h3>
+                      <p className="text-muted-foreground mt-1">
+                        Communications with the guest will appear here
+                      </p>
+                      <Button className="mt-4">
+                        <MessageSquare className="mr-2 h-4 w-4" /> Send Message
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );
