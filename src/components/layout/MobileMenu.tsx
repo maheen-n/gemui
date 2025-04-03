@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -33,7 +34,8 @@ import {
   Shield,
   CreditCard,
   FileSpreadsheet,
-  Settings2
+  Settings2,
+  Plane
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Link } from 'react-router-dom';
@@ -52,7 +54,7 @@ const navItems: NavItem[] = [
   { to: '/collaboration', icon: Users2, label: 'Collaboration' },
   { to: '/guest-management', icon: ConciergeBell, label: 'Guest Management', children: [
     { to: '/room-planning', icon: BedDouble, label: 'Room Planning' },
-    { to: '/guest-management/reservations', icon: Calendar, label: 'Reservations' },
+    { to: '/guest-management/reservations', icon: Plane, label: 'Arrivals' },
     { to: '/guest-management/spa-booking', icon: Sparkles, label: 'Spa Booking' },
     { to: '/guest-profiles', icon: Users, label: 'Guest Profiles' },
     { to: '/loyalty-transactions', icon: CreditCard, label: 'Loyalty Transactions' },

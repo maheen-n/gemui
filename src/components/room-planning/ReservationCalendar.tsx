@@ -1,10 +1,17 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { addDays, format, isBefore, isAfter, startOfToday, eachDayOfInterval, addMonths } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Reservation, RoomType } from '@/types';
 import RoomAssignmentModal from './RoomAssignmentModal';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ReservationCalendarProps {
   reservations: Reservation[];
@@ -17,6 +24,7 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
   roomTypes,
   onAssignRoom
 }) => {
+  const navigate = useNavigate();
   const today = startOfToday();
   const [startDate, setStartDate] = useState(today);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
@@ -35,7 +43,6 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
   
   const handleReservationClick = (reservation: Reservation) => {
     setSelectedReservation(reservation);
-    setShowModal(true);
   };
   
   const handleCloseModal = () => {
@@ -48,6 +55,10 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
       onAssignRoom(selectedReservation.id, roomNumber);
       handleCloseModal();
     }
+  };
+  
+  const handleViewReservationDetails = (reservation: Reservation) => {
+    navigate(`/guest-management/reservation-details/${reservation.id}`, { state: { from: 'room-planning' }});
   };
 
   // Group reservations by room type
@@ -108,21 +119,33 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
                     <td key={dateIndex} className="border-r p-0 relative min-w-[100px]" style={{ height: Math.max(64, dayReservations.length * 28) + 'px' }}>
                       <div className="absolute inset-0 p-1">
                         {dayReservations.map((reservation, resIndex) => (
-                          <div 
-                            key={`${reservation.id}-${dateIndex}`}
-                            onClick={() => handleReservationClick(reservation)}
-                            className={`mb-1 flex items-center justify-between px-2 py-1 text-xs 
-                              ${reservation.roomNumber ? 'bg-blue-100 text-blue-900 border border-blue-200' : 'bg-gray-100 text-gray-800 border border-gray-200'} 
-                              ${isBefore(date, today) ? 'opacity-60' : 'cursor-pointer hover:opacity-90'} 
-                              rounded`}
-                          >
-                            <span className="truncate">{reservation.guestName}</span>
-                            {reservation.roomNumber && (
-                              <span className="ml-1 px-1 bg-blue-200 text-blue-800 rounded text-[10px]">
-                                {reservation.roomNumber}
-                              </span>
-                            )}
-                          </div>
+                          <DropdownMenu key={`${reservation.id}-${dateIndex}`}>
+                            <DropdownMenuTrigger asChild>
+                              <div className={`mb-1 flex items-center justify-between px-2 py-1 text-xs 
+                                ${reservation.roomNumber ? 'bg-blue-100 text-blue-900 border border-blue-200' : 'bg-gray-100 text-gray-800 border border-gray-200'} 
+                                ${isBefore(date, today) ? 'opacity-60' : 'cursor-pointer hover:opacity-90'} 
+                                rounded`}
+                              >
+                                <span className="truncate">{reservation.guestName}</span>
+                                {reservation.roomNumber && (
+                                  <span className="ml-1 px-1 bg-blue-200 text-blue-800 rounded text-[10px]">
+                                    {reservation.roomNumber}
+                                  </span>
+                                )}
+                              </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => {
+                                setSelectedReservation(reservation);
+                                setShowModal(true);
+                              }}>
+                                Assign Room
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewReservationDetails(reservation)}>
+                                <Eye className="h-3.5 w-3.5 mr-2" /> View Details
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         ))}
                       </div>
                     </td>
