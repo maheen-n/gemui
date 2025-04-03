@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { format, addDays, startOfToday, parseISO, isSameDay, addHours, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
@@ -208,6 +209,7 @@ const SpaBookingPage = () => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
   const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'couples'>('all');
   const [isCustomBooking, setIsCustomBooking] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<SpaBooking | null>(null);
   
   const filteredBookings = existingBookings.filter(booking => 
     isSameDay(parseISO(booking.startTime), selectedDate)
@@ -237,6 +239,26 @@ const SpaBookingPage = () => {
   };
 
   const handleTimeSlotSelect = (timeSlot: string) => {
+    // Find if there's an existing booking at this time slot
+    const existingBooking = existingBookings.find(
+      booking => booking.startTime === timeSlot
+    );
+
+    if (existingBooking) {
+      // We're editing an existing booking
+      setEditingBooking(existingBooking);
+      setSelectedService(spaServices.find(service => service.id === existingBooking.serviceId) || null);
+      if (selectedService) {
+        setSelectedDuration(
+          selectedService.durations.find(duration => duration.id === existingBooking.durationId) || 
+          selectedService.durations[0]
+        );
+      }
+    } else {
+      // New booking
+      setEditingBooking(null);
+    }
+
     setIsCustomBooking(false);
     setSelectedTimeSlot(timeSlot);
     setIsBookingModalOpen(true);
@@ -253,6 +275,7 @@ const SpaBookingPage = () => {
     setIsCustomBooking(false);
     setSelectedService(null);
     setSelectedDuration(null);
+    setEditingBooking(null);
   };
 
   return (
@@ -341,6 +364,7 @@ const SpaBookingPage = () => {
             setIsCustomBooking(false);
             setSelectedService(null);
             setSelectedDuration(null);
+            setEditingBooking(null);
           }}
           service={selectedService}
           duration={selectedDuration}
@@ -349,6 +373,7 @@ const SpaBookingPage = () => {
           onSubmit={handleBookingSubmit}
           isCustomBooking={isCustomBooking}
           services={spaServices}
+          editingBooking={editingBooking}
         />
       )}
     </DashboardLayout>

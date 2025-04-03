@@ -20,30 +20,10 @@ import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Clock, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Info, Edit, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SpaBooking, SpaService, SpaServiceDuration } from '@/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-
-function Plus(props: any) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      {...props}
-    >
-      <path d="M5 12h14" />
-      <path d="M12 5v14" />
-    </svg>
-  );
-}
 
 interface SpaCalendarViewProps {
   bookings: SpaBooking[];
@@ -132,6 +112,12 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
     setIsPopoverOpen(true);
   };
 
+  const handleEditBooking = (booking: SpaBooking) => {
+    setIsPopoverOpen(false);
+    setSelectedBooking(null);
+    onTimeSlotSelect(booking.startTime);
+  };
+
   const handleCloseBookingDetails = () => {
     setIsPopoverOpen(false);
     setSelectedBooking(null);
@@ -205,7 +191,9 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
               <Button 
                 variant="default"
                 size="sm"
+                onClick={() => handleEditBooking(selectedBooking)}
               >
+                <Edit className="h-4 w-4 mr-1" />
                 Edit Booking
               </Button>
             )}
@@ -382,7 +370,7 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
                   >
                     <div className="font-medium text-sm">{dayNames[dayIndex]}</div>
                     <div className={cn(
-                      "text-lg rounded-full w-8 h-8 mx-auto flex items-center justify-center",
+                      "text-lg rounded-full w-8 h-8 mx-auto flex items-center justify-center mt-1",
                       isToday && "bg-primary text-primary-foreground",
                       isSelected && !isToday && "ring-1 ring-primary"
                     )}>
@@ -431,6 +419,11 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
                           isPeakHour && "bg-yellow-50/30",
                           isSameDay(day, selectedDate) && "bg-accent/10"
                         )}
+                        onClick={() => {
+                          const timeSlot = new Date(day);
+                          timeSlot.setHours(hour, 0, 0, 0);
+                          onTimeSlotSelect(timeSlot.toISOString());
+                        }}
                       >
                         {hourBookings.length > 0 ? (
                           <div className="absolute inset-0 p-1 flex flex-col gap-1 overflow-hidden">
@@ -468,20 +461,19 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
                             })}
                           </div>
                         ) : (
-                          selectedService && selectedDuration && (
-                            <button
-                              onClick={() => {
-                                const timeSlot = new Date(day);
-                                timeSlot.setHours(hour, 0, 0, 0);
-                                onTimeSlotSelect(timeSlot.toISOString());
-                              }}
-                              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-accent/30 transition-opacity"
-                            >
-                              <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
-                                <Plus className="h-3 w-3 text-primary" />
-                              </div>
-                            </button>
-                          )
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const timeSlot = new Date(day);
+                              timeSlot.setHours(hour, 0, 0, 0);
+                              onTimeSlotSelect(timeSlot.toISOString());
+                            }}
+                            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-accent/30 transition-opacity"
+                          >
+                            <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
+                              <Plus className="h-3 w-3 text-primary" />
+                            </div>
+                          </button>
                         )}
                       </div>
                     );
@@ -491,12 +483,6 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
             </div>
           </div>
         </ScrollArea>
-        
-        {!selectedService && (
-          <div className="text-center py-3 text-muted-foreground bg-accent/10 rounded-md mt-4">
-            Select a service and duration to book appointments
-          </div>
-        )}
       </div>
     );
   };
