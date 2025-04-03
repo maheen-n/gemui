@@ -13,7 +13,8 @@ import {
   isAfter, 
   startOfWeek, 
   endOfWeek, 
-  isWithinInterval 
+  isWithinInterval,
+  getDay 
 } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,26 @@ import { ChevronLeft, ChevronRight, Clock, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SpaBooking, SpaService, SpaServiceDuration } from '@/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
+function Plus(props: any) {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      {...props}
+    >
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
 
 interface SpaCalendarViewProps {
   bookings: SpaBooking[];
@@ -315,8 +336,15 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
   };
 
   const renderWeekView = () => {
-    const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Week starts on Monday
+    const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const timeSlots = [];
     
+    for (let hour = START_HOUR; hour < END_HOUR; hour++) {
+      timeSlots.push(hour);
+    }
+
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -324,7 +352,7 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <h3 className="text-lg font-medium">
-            Week of {format(weekStart, 'MMMM d, yyyy')}
+            Week of {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
           </h3>
           <Button variant="outline" size="sm" onClick={() => onDateChange(addDays(weekStart, 7))}>
             <ChevronRight className="h-4 w-4" />
@@ -332,68 +360,143 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
         </div>
         
         <ScrollArea className="h-[500px]">
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: 7 }).map((_, dayIndex) => {
-              const day = addDays(weekStart, dayIndex);
-              const dayBookings = bookings.filter(booking => 
-                isSameDay(parseISO(booking.startTime), day)
-              ).sort((a, b) => parseISO(a.startTime).getTime() - parseISO(b.startTime).getTime());
-              
-              const dayLabel = format(day, 'EEE');
-              const dayNumber = format(day, 'd');
-              const isToday = isSameDay(day, new Date());
-              
-              return (
-                <div key={dayIndex} className={cn(
-                  "border rounded-md p-2",
-                  isSameDay(day, selectedDate) && "border-primary"
-                )}>
+          <div className="relative min-w-[800px]">
+            <div className="grid grid-cols-8 gap-1 mb-2 sticky top-0 bg-background z-10">
+              <div className="h-14 border-b font-medium pt-4 pr-4 text-right text-xs text-muted-foreground">
+                Time
+              </div>
+              {Array.from({ length: 7 }).map((_, dayIndex) => {
+                const day = addDays(weekStart, dayIndex);
+                const isToday = isSameDay(day, new Date());
+                const isSelected = isSameDay(day, selectedDate);
+                
+                return (
                   <div 
-                    className={cn(
-                      "text-center font-medium mb-2 p-1 rounded cursor-pointer hover:bg-accent",
-                      isToday && "bg-primary text-primary-foreground"
-                    )}
+                    key={dayIndex}
                     onClick={() => onDateChange(day)}
-                  >
-                    <div>{dayLabel}</div>
-                    <div className="text-lg">{dayNumber}</div>
-                  </div>
-                  <div className="space-y-1 max-h-[420px] overflow-y-auto">
-                    {dayBookings.length > 0 ? (
-                      dayBookings.map((booking, index) => (
-                        <div 
-                          key={index} 
-                          className="text-xs p-2 border rounded cursor-pointer hover:bg-accent/10"
-                          onClick={() => handleBookingClick(booking)}
-                        >
-                          <div className="font-medium truncate">{booking.serviceName}</div>
-                          <div className="flex justify-between items-center mt-1">
-                            <span className="truncate">{format(parseISO(booking.startTime), 'h:mm a')}</span>
-                            <Badge 
-                              variant="outline"
-                              className={cn(
-                                "text-[10px] px-1",
-                                booking.status === 'completed' && "bg-green-100 text-green-800",
-                                booking.status === 'cancelled' && "bg-red-100 text-red-800",
-                                booking.status === 'no-show' && "bg-amber-100 text-amber-800"
-                              )}
-                            >
-                              {booking.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-center text-xs text-muted-foreground py-2">
-                        No bookings
-                      </div>
+                    className={cn(
+                      "h-14 border-b px-2 pt-2 text-center cursor-pointer",
+                      isToday && "bg-accent/30",
+                      isSelected && "border border-primary"
                     )}
+                  >
+                    <div className="font-medium text-sm">{dayNames[dayIndex]}</div>
+                    <div className={cn(
+                      "text-lg rounded-full w-8 h-8 mx-auto flex items-center justify-center",
+                      isToday && "bg-primary text-primary-foreground",
+                      isSelected && !isToday && "ring-1 ring-primary"
+                    )}>
+                      {format(day, 'd')}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            
+            <div className="grid grid-cols-8 gap-1">
+              {timeSlots.map((hour, hourIndex) => (
+                <React.Fragment key={hourIndex}>
+                  <div className="h-16 border-b border-r pr-2 text-right pt-2 text-xs text-muted-foreground">
+                    {format(new Date().setHours(hour, 0, 0, 0), 'h:mm a')}
+                  </div>
+                  
+                  {Array.from({ length: 7 }).map((_, dayIndex) => {
+                    const day = addDays(weekStart, dayIndex);
+                    const currentHourStart = new Date(day);
+                    currentHourStart.setHours(hour, 0, 0, 0);
+                    const currentHourEnd = new Date(day);
+                    currentHourEnd.setHours(hour + 1, 0, 0, 0);
+                    
+                    const hourBookings = bookings.filter(booking => {
+                      const bookingStart = parseISO(booking.startTime);
+                      const bookingEnd = parseISO(booking.endTime);
+                      
+                      return (
+                        isSameDay(bookingStart, day) && 
+                        (
+                          (bookingStart.getHours() === hour) ||
+                          (bookingStart.getHours() < hour && bookingEnd.getHours() > hour) ||
+                          (bookingEnd.getHours() === hour && bookingEnd.getMinutes() > 0)
+                        )
+                      );
+                    });
+                    
+                    const isPeakHour = PEAK_HOURS.includes(hour);
+                    
+                    return (
+                      <div 
+                        key={`${hourIndex}-${dayIndex}`} 
+                        className={cn(
+                          "h-16 border-b relative group",
+                          isPeakHour && "bg-yellow-50/30",
+                          isSameDay(day, selectedDate) && "bg-accent/10"
+                        )}
+                      >
+                        {hourBookings.length > 0 ? (
+                          <div className="absolute inset-0 p-1 flex flex-col gap-1 overflow-hidden">
+                            {hourBookings.map((booking, idx) => {
+                              const bookingStart = parseISO(booking.startTime);
+                              const startMinutePercentage = bookingStart.getHours() === hour ? 
+                                (bookingStart.getMinutes() / 60) * 100 : 0;
+                              
+                              const statusColor = booking.status === 'completed' ? 'bg-green-100 border-green-300' : 
+                                                 booking.status === 'cancelled' ? 'bg-red-100 border-red-300' : 
+                                                 booking.status === 'no-show' ? 'bg-amber-100 border-amber-300' : 
+                                                 'bg-blue-100 border-blue-300';
+                              
+                              return (
+                                <div
+                                  key={idx}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBookingClick(booking);
+                                  }}
+                                  style={{ top: `${startMinutePercentage}%` }}
+                                  className={cn(
+                                    "absolute left-0 right-0 mx-1 px-1 py-0.5 text-xs truncate rounded border cursor-pointer",
+                                    statusColor
+                                  )}
+                                >
+                                  <div className="font-medium truncate">
+                                    {format(bookingStart, 'h:mm')} {booking.serviceName}
+                                  </div>
+                                  <div className="truncate text-[10px]">
+                                    {booking.guestName}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          selectedService && selectedDuration && (
+                            <button
+                              onClick={() => {
+                                const timeSlot = new Date(day);
+                                timeSlot.setHours(hour, 0, 0, 0);
+                                onTimeSlotSelect(timeSlot.toISOString());
+                              }}
+                              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-accent/30 transition-opacity"
+                            >
+                              <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
+                                <Plus className="h-3 w-3 text-primary" />
+                              </div>
+                            </button>
+                          )
+                        )}
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </ScrollArea>
+        
+        {!selectedService && (
+          <div className="text-center py-3 text-muted-foreground bg-accent/10 rounded-md mt-4">
+            Select a service and duration to book appointments
+          </div>
+        )}
       </div>
     );
   };
