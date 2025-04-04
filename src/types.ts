@@ -1,5 +1,3 @@
-
-
 // Add missing types related to SpaBooking functionality
 
 export interface Room {
@@ -56,6 +54,7 @@ export interface SpaBooking {
   therapistId?: string;
   therapistName?: string;
   roomId?: string;
+  specialRequests?: string;
   createdAt: string;
 }
 
