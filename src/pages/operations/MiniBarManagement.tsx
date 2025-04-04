@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +18,8 @@ const MiniBarManagement = () => {
             <h1 className="text-2xl font-bold tracking-tight">MiniBar Management</h1>
             <p className="text-muted-foreground">Track minibar usage and manage inventory</p>
           </div>
+          {/* Remove the Back and Settings buttons */}
+          {/*
           <div className="flex gap-2">
             <Button variant="outline" asChild>
               <Link to="/operations/housekeeping">
@@ -31,6 +32,7 @@ const MiniBarManagement = () => {
               MiniBar Settings
             </Button>
           </div>
+          */}
         </div>
 
         <Tabs defaultValue="tracker" className="space-y-4">
