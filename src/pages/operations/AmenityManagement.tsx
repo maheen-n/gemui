@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +7,8 @@ import { AmenityConfiguration } from '@/components/housekeeping/AmenityConfigura
 import { AmenityTracker } from '@/components/housekeeping/AmenityTracker';
 import { AmenityLogViewer } from '@/components/housekeeping/AmenityLogViewer';
 import { Button } from '@/components/ui/button';
-import { ClipboardList, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ClipboardList, Settings, Beer, ArrowLeft } from 'lucide-react';
 
 const AmenityManagement = () => {
   return (
@@ -17,10 +19,24 @@ const AmenityManagement = () => {
             <h1 className="text-2xl font-bold tracking-tight">Amenity Management</h1>
             <p className="text-muted-foreground">Track amenity usage and manage housekeeping operations</p>
           </div>
-          <Button variant="outline">
-            <Settings className="mr-2 h-4 w-4" />
-            Amenity Settings
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/operations/housekeeping/minibar">
+                <Beer className="mr-2 h-4 w-4" />
+                MiniBar Management
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/operations/housekeeping">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Housekeeping
+              </Link>
+            </Button>
+            <Button variant="outline">
+              <Settings className="mr-2 h-4 w-4" />
+              Amenity Settings
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="tracker" className="space-y-4">

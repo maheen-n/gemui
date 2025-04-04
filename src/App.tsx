@@ -27,6 +27,7 @@ import SpaBooking from "./pages/guest-management/SpaBooking";
 // Operations pages
 import Housekeeping from "./pages/operations/Housekeeping";
 import AmenityManagement from "./pages/operations/AmenityManagement";
+import MiniBarManagement from "./pages/operations/MiniBarManagement";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -59,6 +60,7 @@ function App() {
             <Route path="/lost-found" element={<LostFound />} />
             <Route path="/operations/housekeeping" element={<Housekeeping />} />
             <Route path="/operations/housekeeping/amenity" element={<AmenityManagement />} />
+            <Route path="/operations/housekeeping/minibar" element={<MiniBarManagement />} />
             
             {/* Other routes */}
             <Route path="/room-planning" element={<RoomPlanning />} />

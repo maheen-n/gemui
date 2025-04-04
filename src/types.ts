@@ -1,3 +1,4 @@
+
 // Add missing types related to SpaBooking functionality
 
 export interface Room {
@@ -129,3 +130,39 @@ export interface AmenityLogItem {
   amenityName: string;
   count: number;
 }
+
+// New types for MiniBar Management
+export interface MiniBarItem {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  defaultCount: number;
+  price: number;
+  image?: string;
+}
+
+export interface RoomMiniBarConfig {
+  roomTypeId: string;
+  miniBarItemId: string;
+  count: number;
+}
+
+export interface MiniBarLog {
+  id: string;
+  roomId: string;
+  roomNumber: string;
+  staffId: string;
+  staffName: string;
+  date: string;
+  items: MiniBarLogItem[];
+  totalCharge: number;
+}
+
+export interface MiniBarLogItem {
+  itemId: string;
+  itemName: string;
+  consumed: number;
+  price: number;
+}
+
