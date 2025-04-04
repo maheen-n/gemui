@@ -26,6 +26,7 @@ import SpaBooking from "./pages/guest-management/SpaBooking";
 
 // Operations pages
 import Housekeeping from "./pages/operations/Housekeeping";
+import AmenityManagement from "./pages/operations/AmenityManagement";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -57,6 +58,7 @@ function App() {
             <Route path="/work-orders" element={<WorkOrders />} />
             <Route path="/lost-found" element={<LostFound />} />
             <Route path="/operations/housekeeping" element={<Housekeeping />} />
+            <Route path="/operations/housekeeping/amenity" element={<AmenityManagement />} />
             
             {/* Other routes */}
             <Route path="/room-planning" element={<RoomPlanning />} />

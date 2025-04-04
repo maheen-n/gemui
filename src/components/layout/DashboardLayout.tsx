@@ -89,18 +89,37 @@ const NavItem = ({ to, icon, label, isActive, isCollapsed, children }: NavItemPr
         {isOpen && !isCollapsed && (
           <div>
             {children.map((child) => (
-              <Link
-                key={child.to}
-                to={child.to}
-                className={`flex items-center gap-3 px-4 py-2.5 pl-11 transition-all duration-200 ${
-                  location.pathname === child.to
-                    ? 'bg-[#1a2236] text-white font-medium'
-                    : 'text-gray-300 hover:bg-[#1a2236] hover:text-white'
-                }`}
-              >
-                <child.icon className="h-5 w-5" />
-                <span>{child.label}</span>
-              </Link>
+              <div key={child.to}>
+                <Link
+                  to={child.to}
+                  className={`flex items-center gap-3 px-4 py-2.5 pl-11 transition-all duration-200 ${
+                    location.pathname === child.to
+                      ? 'bg-[#1a2236] text-white font-medium'
+                      : 'text-gray-300 hover:bg-[#1a2236] hover:text-white'
+                  }`}
+                >
+                  <child.icon className="h-5 w-5" />
+                  <span>{child.label}</span>
+                </Link>
+                {child.children && (
+                  <div className="pl-4">
+                    {child.children.map((subChild) => (
+                      <Link
+                        key={subChild.to}
+                        to={subChild.to}
+                        className={`flex items-center gap-3 px-4 py-2.5 pl-11 transition-all duration-200 ${
+                          location.pathname === subChild.to
+                            ? 'bg-[#1a2236] text-white font-medium'
+                            : 'text-gray-300 hover:bg-[#1a2236] hover:text-white'
+                        }`}
+                      >
+                        <subChild.icon className="h-5 w-5" />
+                        <span>{subChild.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
@@ -157,7 +176,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { to: '/operations', icon: Building2, label: 'Operations', children: [
       { to: '/work-orders', icon: Wrench, label: 'Work Orders' },
       { to: '/lost-found', icon: Key, label: 'Lost & Found' },
-      { to: '/operations/housekeeping', icon: Bath, label: 'Housekeeping' }
+      { to: '/operations/housekeeping', icon: Bath, label: 'Housekeeping', children: [
+        { to: '/operations/housekeeping/amenity', icon: Bath, label: 'Amenity Management' }
+      ] }
     ]},
     { to: '/quality-compliance', icon: Shield, label: 'Quality & Compliance' },
     { to: '/financials', icon: FileSpreadsheet, label: 'Financials' },
