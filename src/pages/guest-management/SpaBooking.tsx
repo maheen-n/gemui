@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { format, addDays, startOfToday, parseISO, isSameDay, addHours, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
+import { format, addDays, startOfToday, parseISO, isSameDay, addHours, startOfMonth, endOfMonth, differenceInDays, addMinutes } from 'date-fns';
 import { SpaService, SpaServiceDuration, SpaBooking } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -210,8 +210,9 @@ const SpaBookingPage = () => {
   const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'couples'>('all');
   const [isCustomBooking, setIsCustomBooking] = useState(false);
   const [editingBooking, setEditingBooking] = useState<SpaBooking | null>(null);
+  const [bookings, setBookings] = useState<SpaBooking[]>(existingBookings);
   
-  const filteredBookings = existingBookings.filter(booking => 
+  const filteredBookings = bookings.filter(booking => 
     isSameDay(parseISO(booking.startTime), selectedDate)
   );
 
@@ -240,7 +241,7 @@ const SpaBookingPage = () => {
 
   const handleTimeSlotSelect = (timeSlot: string) => {
     // Find if there's an existing booking at this time slot
-    const existingBooking = existingBookings.find(
+    const existingBooking = bookings.find(
       booking => booking.startTime === timeSlot
     );
 
@@ -266,10 +267,48 @@ const SpaBookingPage = () => {
   
   const handleBookingSubmit = (bookingData: any) => {
     console.log('Booking submitted:', bookingData);
-    toast({
-      title: "Booking successful!",
-      description: `${bookingData.serviceName} booked for ${bookingData.guestName} on ${format(selectedDate, 'MMMM d, yyyy')} at ${format(parseISO(bookingData.startTime), 'h:mm a')}`,
-    });
+    
+    // If editing, update the existing booking
+    if (editingBooking) {
+      setBookings(prev => 
+        prev.map(booking => 
+          booking.id === editingBooking.id ? 
+          { ...booking, ...bookingData } : 
+          booking
+        )
+      );
+      
+      toast({
+        title: "Booking updated!",
+        description: `Updated booking for ${bookingData.guestName} on ${format(parseISO(bookingData.startTime), 'MMMM d, yyyy')} at ${format(parseISO(bookingData.startTime), 'h:mm a')}`,
+      });
+    } else {
+      // Add new booking
+      const newBooking: SpaBooking = {
+        id: `booking-${Date.now()}`, // Generate a unique ID
+        guestId: `guest-${Math.floor(Math.random() * 100) + 1}`,
+        guestName: bookingData.guestName,
+        serviceId: bookingData.serviceId,
+        serviceName: bookingData.serviceName,
+        durationId: bookingData.durationId,
+        durationMinutes: bookingData.durationMinutes,
+        startTime: bookingData.startTime,
+        endTime: bookingData.endTime,
+        status: 'booked',
+        therapistId: bookingData.therapistId || `therapist-${Math.floor(Math.random() * 10) + 1}`,
+        therapistName: bookingData.therapistName || therapistNames[Math.floor(Math.random() * therapistNames.length)],
+        roomId: bookingData.roomId || roomIds[Math.floor(Math.random() * roomIds.length)],
+        createdAt: new Date().toISOString()
+      };
+      
+      setBookings(prev => [...prev, newBooking]);
+      
+      toast({
+        title: "Booking successful!",
+        description: `${bookingData.serviceName || 'Service'} booked for ${bookingData.guestName} on ${format(parseISO(bookingData.startTime), 'MMMM d, yyyy')} at ${format(parseISO(bookingData.startTime), 'h:mm a')}`,
+      });
+    }
+    
     setIsBookingModalOpen(false);
     setSelectedTimeSlot(null);
     setIsCustomBooking(false);
@@ -341,7 +380,7 @@ const SpaBookingPage = () => {
               </CardHeader>
               <CardContent>
                 <SpaCalendarView 
-                  bookings={existingBookings}
+                  bookings={bookings}
                   services={spaServices}
                   selectedDate={selectedDate}
                   selectedService={selectedService}
@@ -374,6 +413,7 @@ const SpaBookingPage = () => {
           isCustomBooking={isCustomBooking}
           services={spaServices}
           editingBooking={editingBooking}
+          allowTimeChange={true}
         />
       )}
     </DashboardLayout>

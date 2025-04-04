@@ -429,6 +429,8 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
                           <div className="absolute inset-0 p-1 flex flex-col gap-1 overflow-hidden">
                             {hourBookings.map((booking, idx) => {
                               const bookingStart = parseISO(booking.startTime);
+                              const bookingWidth = 100 / Math.min(hourBookings.length, 3);
+                              const bookingLeft = (idx % 3) * bookingWidth;
                               const startMinutePercentage = bookingStart.getHours() === hour ? 
                                 (bookingStart.getMinutes() / 60) * 100 : 0;
                               
@@ -444,10 +446,15 @@ const SpaCalendarView: React.FC<SpaCalendarViewProps> = ({
                                     e.stopPropagation();
                                     handleBookingClick(booking);
                                   }}
-                                  style={{ top: `${startMinutePercentage}%` }}
+                                  style={{ 
+                                    top: `${startMinutePercentage}%`,
+                                    width: `${bookingWidth}%`,
+                                    left: `${bookingLeft}%`
+                                  }}
                                   className={cn(
-                                    "absolute left-0 right-0 mx-1 px-1 py-0.5 text-xs truncate rounded border cursor-pointer",
-                                    statusColor
+                                    "absolute px-1 py-0.5 text-xs truncate rounded border cursor-pointer",
+                                    statusColor,
+                                    idx >= 3 ? "hidden sm:block" : ""
                                   )}
                                 >
                                   <div className="font-medium truncate">
