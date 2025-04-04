@@ -177,7 +177,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { to: '/operations', icon: Building2, label: 'Operations', children: [
       { to: '/work-orders', icon: Wrench, label: 'Work Orders' },
       { to: '/lost-found', icon: Key, label: 'Lost & Found' },
-      { to: '/operations/housekeeping', icon: Bath, label: 'Housekeeping', children: [
+      { icon: Bath, label: 'Housekeeping', children: [
         { to: '/operations/housekeeping/amenity', icon: ClipboardCheck, label: 'Amenity Management' },
         { to: '/operations/housekeeping/minibar', icon: Beer, label: 'MiniBar Management' }
       ] }

@@ -25,7 +25,6 @@ import ReservationDetails from "./pages/guest-management/ReservationDetails";
 import SpaBooking from "./pages/guest-management/SpaBooking";
 
 // Operations pages
-import Housekeeping from "./pages/operations/Housekeeping";
 import AmenityManagement from "./pages/operations/AmenityManagement";
 import MiniBarManagement from "./pages/operations/MiniBarManagement";
 
@@ -58,7 +57,6 @@ function App() {
             {/* Operations */}
             <Route path="/work-orders" element={<WorkOrders />} />
             <Route path="/lost-found" element={<LostFound />} />
-            <Route path="/operations/housekeeping" element={<Housekeeping />} />
             <Route path="/operations/housekeeping/amenity" element={<AmenityManagement />} />
             <Route path="/operations/housekeeping/minibar" element={<MiniBarManagement />} />
             
