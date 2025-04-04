@@ -7,7 +7,8 @@ import { MiniBarConfiguration } from '@/components/minibar/MiniBarConfiguration'
 import { MiniBarTracker } from '@/components/minibar/MiniBarTracker';
 import { MiniBarLogViewer } from '@/components/minibar/MiniBarLogViewer';
 import { Button } from '@/components/ui/button';
-import { Beer, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Beer, Settings, ArrowLeft } from 'lucide-react';
 
 const MiniBarManagement = () => {
   return (
@@ -18,10 +19,18 @@ const MiniBarManagement = () => {
             <h1 className="text-2xl font-bold tracking-tight">MiniBar Management</h1>
             <p className="text-muted-foreground">Track minibar usage and manage inventory</p>
           </div>
-          <Button variant="outline">
-            <Settings className="mr-2 h-4 w-4" />
-            MiniBar Settings
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/operations/housekeeping">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Housekeeping
+              </Link>
+            </Button>
+            <Button variant="outline">
+              <Settings className="mr-2 h-4 w-4" />
+              MiniBar Settings
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="tracker" className="space-y-4">

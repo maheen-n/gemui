@@ -35,7 +35,8 @@ import {
   FileSpreadsheet,
   Settings2,
   Plane,
-  Bath
+  Bath,
+  Beer
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Link } from 'react-router-dom';
@@ -65,7 +66,8 @@ const navItems: NavItem[] = [
     { to: '/work-orders', icon: Wrench, label: 'Work Orders' },
     { to: '/lost-found', icon: Key, label: 'Lost & Found' },
     { to: '/operations/housekeeping', icon: Bath, label: 'Housekeeping', children: [
-      { to: '/operations/housekeeping/amenity', icon: Bath, label: 'Amenity Management' }
+      { to: '/operations/housekeeping/amenity', icon: ClipboardCheck, label: 'Amenity Management' },
+      { to: '/operations/housekeeping/minibar', icon: Beer, label: 'MiniBar Management' }
     ] }
   ]},
   { to: '/quality-compliance', icon: Shield, label: 'Quality & Compliance' },

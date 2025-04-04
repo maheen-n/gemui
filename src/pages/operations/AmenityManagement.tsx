@@ -8,7 +8,7 @@ import { AmenityTracker } from '@/components/housekeeping/AmenityTracker';
 import { AmenityLogViewer } from '@/components/housekeeping/AmenityLogViewer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ClipboardList, Settings, Beer, ArrowLeft } from 'lucide-react';
+import { ClipboardList, Settings, ArrowLeft } from 'lucide-react';
 
 const AmenityManagement = () => {
   return (
@@ -20,12 +20,6 @@ const AmenityManagement = () => {
             <p className="text-muted-foreground">Track amenity usage and manage housekeeping operations</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link to="/operations/housekeeping/minibar">
-                <Beer className="mr-2 h-4 w-4" />
-                MiniBar Management
-              </Link>
-            </Button>
             <Button variant="outline" asChild>
               <Link to="/operations/housekeeping">
                 <ArrowLeft className="mr-2 h-4 w-4" />
