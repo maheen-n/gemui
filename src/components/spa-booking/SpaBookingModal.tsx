@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format, parseISO, addMinutes, set } from 'date-fns';
-import { SpaService, SpaServiceDuration } from '@/types';
+import { SpaService, SpaServiceDuration, SpaBooking, SpaBookingModalProps } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -14,18 +14,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-interface SpaBookingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  service: SpaService | null;
-  duration: SpaServiceDuration | null;
-  selectedDate: Date;
-  selectedTimeSlot: string | null;
-  onSubmit: (bookingData: any) => void;
-  isCustomBooking?: boolean;
-  services?: SpaService[];
-}
-
 const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
   isOpen,
   onClose,
@@ -35,7 +23,9 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
   selectedTimeSlot,
   onSubmit,
   isCustomBooking = false,
-  services = []
+  services = [],
+  editingBooking,
+  allowTimeChange = false
 }) => {
   const { toast } = useToast();
   const [guestName, setGuestName] = useState('');
@@ -46,6 +36,23 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
   const [customTime, setCustomTime] = useState('09:00');
   const [selectedService, setSelectedService] = useState<SpaService | null>(initialService);
   const [selectedDuration, setSelectedDuration] = useState<SpaServiceDuration | null>(initialDuration);
+  
+  // Set form values when editing a booking
+  useEffect(() => {
+    if (editingBooking) {
+      setGuestName(editingBooking.guestName || '');
+      setSpecialRequests(editingBooking.specialRequests || '');
+      setTherapist(editingBooking.therapistId || '');
+      
+      // Set time from the booking if editing
+      if (editingBooking.startTime) {
+        const bookingTime = new Date(editingBooking.startTime);
+        const hours = bookingTime.getHours().toString().padStart(2, '0');
+        const minutes = bookingTime.getMinutes().toString().padStart(2, '0');
+        setCustomTime(`${hours}:${minutes}`);
+      }
+    }
+  }, [editingBooking]);
   
   // Mock therapists
   const mockTherapists = [
@@ -89,7 +96,7 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
     }
     
     let bookingTime = selectedTimeSlot;
-    if (isCustomBooking && customTime) {
+    if ((isCustomBooking || allowTimeChange) && customTime) {
       const [hours, minutes] = customTime.split(':').map(Number);
       const customDate = set(selectedDate, { hours, minutes });
       bookingTime = customDate.toISOString();
@@ -128,10 +135,16 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
       <DialogContent className="sm:max-w-[500px] max-h-[85vh]">
         <DialogHeader>
           <DialogTitle>
-            {isCustomBooking ? 'Create Custom Booking' : 'Book Spa Service'}
+            {editingBooking 
+              ? 'Edit Booking' 
+              : isCustomBooking 
+                ? 'Create Custom Booking' 
+                : 'Book Spa Service'}
           </DialogTitle>
           <DialogDescription>
-            Fill in the details to complete the booking
+            {editingBooking 
+              ? 'Modify the booking details'
+              : 'Fill in the details to complete the booking'}
           </DialogDescription>
         </DialogHeader>
         
@@ -201,7 +214,7 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
                     <Calendar className="mr-1 h-4 w-4" />
                     <span>{format(selectedDate, 'MMM d, yyyy')}</span>
                   </div>
-                  {isCustomBooking ? (
+                  {isCustomBooking || allowTimeChange ? (
                     <div className="flex items-center">
                       <Clock className="mr-1 h-4 w-4" />
                       <span>{customTime}</span>
@@ -278,7 +291,7 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
               />
             </div>
             
-            {isCustomBooking && (
+            {(isCustomBooking || allowTimeChange) && (
               <div className="space-y-2">
                 <Label htmlFor="customTime">Time *</Label>
                 <Input
@@ -300,7 +313,7 @@ const SpaBookingModal: React.FC<SpaBookingModalProps> = ({
             Cancel
           </Button>
           <Button type="submit" onClick={handleSubmit}>
-            Confirm Booking
+            {editingBooking ? 'Update Booking' : 'Confirm Booking'}
           </Button>
         </DialogFooter>
       </DialogContent>

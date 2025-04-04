@@ -8,15 +8,21 @@ type ThemeContextType = {
   setTheme: (theme: Theme) => void;
 };
 
+type ThemeProviderProps = {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
+};
+
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+  defaultTheme = "system",
+  storageKey = "theme",
+}: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage?.getItem("theme") as Theme) || "system"
+    () => (localStorage?.getItem(storageKey) as Theme) || defaultTheme
   );
 
   useEffect(() => {
@@ -44,7 +50,7 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem("theme", theme);
+      localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
   };

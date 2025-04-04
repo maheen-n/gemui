@@ -1,4 +1,5 @@
 
+
 // Add missing types related to SpaBooking functionality
 
 export interface Room {
@@ -74,7 +75,7 @@ export interface Reservation {
 // Type alias for Reservation to avoid conflicts in Reservations.tsx
 export type GuestReservation = Reservation;
 
-// New type for SpaBookingModal props
+// Updated SpaBookingModal props to include editingBooking property
 export interface SpaBookingModalProps {
   isOpen: boolean;
   onClose: () => void;
