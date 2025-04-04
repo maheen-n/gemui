@@ -19,10 +19,13 @@ import LostFound from "./pages/LostFound";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
-// Include the ReservationDetails page in the import statements
+// Guest Management pages
 import Reservations from "./pages/guest-management/Reservations";
 import ReservationDetails from "./pages/guest-management/ReservationDetails";
 import SpaBooking from "./pages/guest-management/SpaBooking";
+
+// Operations pages
+import Housekeeping from "./pages/operations/Housekeeping";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -50,6 +53,11 @@ function App() {
             <Route path="/guest-management/reservation-details/:id" element={<ReservationDetails />} />
             <Route path="/guest-management/spa-booking" element={<SpaBooking />} />
             
+            {/* Operations */}
+            <Route path="/work-orders" element={<WorkOrders />} />
+            <Route path="/lost-found" element={<LostFound />} />
+            <Route path="/operations/housekeeping" element={<Housekeeping />} />
+            
             {/* Other routes */}
             <Route path="/room-planning" element={<RoomPlanning />} />
             <Route path="/rooms" element={<Rooms />} />
@@ -57,8 +65,6 @@ function App() {
             <Route path="/events" element={<Events />} />
             <Route path="/staff" element={<Staff />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="/work-orders" element={<WorkOrders />} />
-            <Route path="/lost-found" element={<LostFound />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

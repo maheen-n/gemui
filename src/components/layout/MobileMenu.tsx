@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -35,7 +34,8 @@ import {
   CreditCard,
   FileSpreadsheet,
   Settings2,
-  Plane
+  Plane,
+  Bath
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Link } from 'react-router-dom';
@@ -63,7 +63,8 @@ const navItems: NavItem[] = [
   { to: '/guest-experience', icon: Star, label: 'Guest Experience' },
   { to: '/operations', icon: Building2, label: 'Operations', children: [
     { to: '/work-orders', icon: Wrench, label: 'Work Orders' },
-    { to: '/lost-found', icon: Key, label: 'Lost & Found' }
+    { to: '/lost-found', icon: Key, label: 'Lost & Found' },
+    { to: '/operations/housekeeping', icon: Bath, label: 'Housekeeping' }
   ]},
   { to: '/quality-compliance', icon: Shield, label: 'Quality & Compliance' },
   { to: '/financials', icon: FileSpreadsheet, label: 'Financials' },

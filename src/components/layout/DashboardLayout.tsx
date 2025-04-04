@@ -28,7 +28,6 @@ import {
   Hotel,
   ConciergeBell,
   Utensils,
-  Pool,
   Bell,
   Building2,
   ClipboardCheck,
@@ -42,7 +41,8 @@ import {
   CreditCard,
   FileSpreadsheet,
   Settings2,
-  DoorOpen
+  DoorOpen,
+  Bath
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MobileMenu } from './MobileMenu';
@@ -156,7 +156,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { to: '/guest-experience', icon: Star, label: 'Guest Experience' },
     { to: '/operations', icon: Building2, label: 'Operations', children: [
       { to: '/work-orders', icon: Wrench, label: 'Work Orders' },
-      { to: '/lost-found', icon: Key, label: 'Lost & Found' }
+      { to: '/lost-found', icon: Key, label: 'Lost & Found' },
+      { to: '/operations/housekeeping', icon: Bath, label: 'Housekeeping' }
     ]},
     { to: '/quality-compliance', icon: Shield, label: 'Quality & Compliance' },
     { to: '/financials', icon: FileSpreadsheet, label: 'Financials' },
@@ -165,7 +166,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex h-screen bg-background transition-colors duration-300">
-      {/* Desktop Sidebar */}
       <div 
         className={`hidden md:flex md:flex-col bg-[#151b2c] border-r border-[#1e2841] shadow-lg transition-all duration-300 ${
           isSidebarCollapsed ? 'md:w-20' : 'md:w-64'
@@ -228,9 +228,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         )}
       </div>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile Header */}
         <header className="h-16 md:h-0 flex items-center justify-between px-4 border-b border-border md:border-0 bg-background">
           <div className="flex items-center gap-4">
             <MobileMenu />
@@ -241,7 +239,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </header>
         
-        {/* Content */}
         <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto space-y-6">
             {children}

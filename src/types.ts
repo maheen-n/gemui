@@ -1,3 +1,4 @@
+
 // Add missing types related to SpaBooking functionality
 
 export interface Room {
@@ -86,4 +87,45 @@ export interface SpaBookingModalProps {
   services: SpaService[];
   editingBooking: SpaBooking | null;
   allowTimeChange?: boolean;
+}
+
+// New types for Amenity Tracking
+export interface Amenity {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  defaultCount: number;
+  image?: string;
+}
+
+export interface RoomAmenityConfig {
+  roomTypeId: string;
+  amenityId: string;
+  count: number;
+}
+
+export interface CleaningType {
+  id: string;
+  name: string;
+  description: string;
+  amenityMultiplier: number;
+  estimatedDuration: number;
+}
+
+export interface AmenityLog {
+  id: string;
+  roomId: string;
+  roomNumber: string;
+  staffId: string;
+  staffName: string;
+  date: string;
+  cleaningTypeId: string;
+  amenities: AmenityLogItem[];
+}
+
+export interface AmenityLogItem {
+  amenityId: string;
+  amenityName: string;
+  count: number;
 }
