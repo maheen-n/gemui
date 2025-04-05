@@ -26,7 +26,9 @@ import {
   X,
   Maximize2,
   Minimize2,
-  ChevronsUpDown
+  ChevronsUpDown,
+  Wrench,
+  Bell
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Progress } from '@/components/ui/progress';
