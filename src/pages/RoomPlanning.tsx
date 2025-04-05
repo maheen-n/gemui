@@ -66,7 +66,7 @@ const generateReservations = (): Reservation[] => {
         const useDetailViewId = id % 15 === 0 && resIdIndex < reservationIds.length;
         const reservationId = useDetailViewId ? reservationIds[resIdIndex++] : id.toString();
         
-        reservations.push({
+        const reservation: Reservation = {
           id: reservationId,
           guestName,
           reservationNumber: `RES${(1000 + id).toString()}`,
@@ -80,8 +80,9 @@ const generateReservations = (): Reservation[] => {
           totalAmount: roomType.price ? roomType.price * stayDuration : undefined,
           currency: 'USD',
           displayName: guestName
-        });
+        };
         
+        reservations.push(reservation);
         id++;
       }
     }
