@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import { format, isBefore, startOfToday, addDays } from 'date-fns';
@@ -78,10 +77,8 @@ const generateReservations = (): Reservation[] => {
           roomNumber,
           status: 'confirmed',
           createdAt: format(addDays(checkIn, -10), 'yyyy-MM-dd'),
-          // Adding reservation details without using 'booker' which is not in the type
-          totalAmount: roomType.price * stayDuration,
+          totalAmount: roomType.price ? roomType.price * stayDuration : undefined,
           currency: 'USD',
-          // We can set a displayName property if it's part of the Reservation type
           displayName: guestName
         });
         

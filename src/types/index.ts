@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -142,7 +141,6 @@ export interface Notification {
   createdAt: string;
 }
 
-// New types for Room Planning
 export interface RoomType {
   id: string;
   name: string;
@@ -164,7 +162,6 @@ export interface Reservation {
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
-  // Add these properties to the Reservation type
   totalAmount?: number;
   currency?: string;
   displayName?: string;
