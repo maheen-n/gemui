@@ -17,12 +17,14 @@ interface ReservationCalendarProps {
   reservations: Reservation[];
   roomTypes: RoomType[];
   onAssignRoom: (reservationId: string, roomNumber: string) => void;
+  onViewReservationDetails?: (reservationId: string) => void;
 }
 
 const ReservationCalendar: React.FC<ReservationCalendarProps> = ({ 
   reservations, 
   roomTypes,
-  onAssignRoom
+  onAssignRoom,
+  onViewReservationDetails
 }) => {
   const navigate = useNavigate();
   const today = startOfToday();
@@ -58,7 +60,11 @@ const ReservationCalendar: React.FC<ReservationCalendarProps> = ({
   };
   
   const handleViewReservationDetails = (reservation: Reservation) => {
-    navigate(`/guest-management/reservation-details/${reservation.id}`, { state: { from: 'room-planning' }});
+    if (onViewReservationDetails) {
+      onViewReservationDetails(reservation.id);
+    } else {
+      navigate(`/guest-management/reservation-details/${reservation.id}`, { state: { from: 'room-planning' }});
+    }
   };
 
   // Group reservations by room type

@@ -856,7 +856,7 @@ const ReservationDetails = () => {
 
         {selectedRoom && (
           <Sheet open={!!selectedRoom} onOpenChange={() => setSelectedRoom(null)}>
-            <SheetContent className="sm:max-w-md overflow-y-auto">
+            <SheetContent className="sm:max-w-md overflow-y-auto backdrop-blur-md bg-background/95 border-l-2">
               <SheetHeader className="mb-6">
                 <SheetTitle>Room Details</SheetTitle>
                 <SheetDescription>

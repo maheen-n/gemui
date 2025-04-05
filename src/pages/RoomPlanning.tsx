@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import { format, isBefore, startOfToday, addDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ReservationCalendar from '@/components/room-planning/ReservationCalendar';
 import { RoomType, Reservation } from '@/types';
+import { useNavigate } from 'react-router-dom';
 
 // Expanded room types data with more descriptive names
 const roomTypesData: RoomType[] = [
@@ -24,16 +26,19 @@ const guestNames = [
   'Fatima Hassan', 'Pedro Gonzalez', 'Mei Lin', 'Ravi Kumar', 'Sarah Johnson'
 ];
 
-// Generate expanded reservations data with multiple bookings per day
+// Generate expanded reservations data with multiple bookings per day and reservation IDs
 const generateReservations = (): Reservation[] => {
   const today = startOfToday();
   let reservations: Reservation[] = [];
   let id = 1;
   
+  // Reservation IDs for linking to the detail view
+  const reservationIds = ['42751-2425', '20449-2425', '55672-2425'];
+  let resIdIndex = 0;
+  
   // For each room type, create multiple reservations
   roomTypesData.forEach(roomType => {
     // Create multiple reservations for each date range
-    // This will result in multiple bookings on the same day for the same room type
     for (let dayOffset = -3; dayOffset <= 10; dayOffset += 2) {
       // Number of reservations to create for this date range (2-5 bookings)
       const numberOfReservations = Math.floor(Math.random() * 4) + 2;
@@ -58,8 +63,12 @@ const generateReservations = (): Reservation[] => {
           ? `${roomType.id}${(Math.floor(Math.random() * roomType.count) + 1).toString().padStart(2, '0')}` 
           : undefined;
         
+        // Assign one of our detail-view reservation IDs to some reservations
+        const useDetailViewId = id % 15 === 0 && resIdIndex < reservationIds.length;
+        const reservationId = useDetailViewId ? reservationIds[resIdIndex++] : id.toString();
+        
         reservations.push({
-          id: id.toString(),
+          id: reservationId,
           guestName,
           reservationNumber: `RES${(1000 + id).toString()}`,
           pax,
@@ -68,7 +77,18 @@ const generateReservations = (): Reservation[] => {
           roomTypeId: roomType.id,
           roomNumber,
           status: 'confirmed',
-          createdAt: format(addDays(checkIn, -10), 'yyyy-MM-dd')
+          createdAt: format(addDays(checkIn, -10), 'yyyy-MM-dd'),
+          // Additional fields to support room details view
+          booker: {
+            name: guestName,
+            email: `${guestName.toLowerCase().replace(' ', '.')}@example.com`,
+            phone: `+1${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+            agentCode: Math.random() > 0.7 ? `A${Math.floor(Math.random() * 9000) + 1000}` : undefined,
+            agentName: Math.random() > 0.7 ? 'EXPEDIA TRAVEL' : undefined
+          },
+          displayName: guestName,
+          totalAmount: roomType.price * stayDuration,
+          currency: 'USD'
         });
         
         id++;
@@ -82,6 +102,7 @@ const generateReservations = (): Reservation[] => {
 const reservationsData = generateReservations();
 
 const RoomPlanning = () => {
+  const navigate = useNavigate();
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<string | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>(reservationsData);
 
@@ -120,6 +141,10 @@ const RoomPlanning = () => {
       r.id === reservationId ? { ...r, roomNumber } : r
     ));
   };
+  
+  const handleViewReservationDetails = (reservationId: string) => {
+    navigate(`/guest-management/reservation-details/${reservationId}`);
+  };
 
   return (
     <DashboardLayout>
@@ -137,6 +162,7 @@ const RoomPlanning = () => {
               reservations={reservations}
               roomTypes={roomTypesData}
               onAssignRoom={handleAssignRoom}
+              onViewReservationDetails={handleViewReservationDetails}
             />
           </CardContent>
         </Card>
