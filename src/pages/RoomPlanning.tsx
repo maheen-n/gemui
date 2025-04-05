@@ -78,17 +78,11 @@ const generateReservations = (): Reservation[] => {
           roomNumber,
           status: 'confirmed',
           createdAt: format(addDays(checkIn, -10), 'yyyy-MM-dd'),
-          // Additional fields to support room details view
-          booker: {
-            name: guestName,
-            email: `${guestName.toLowerCase().replace(' ', '.')}@example.com`,
-            phone: `+1${Math.floor(Math.random() * 9000000000) + 1000000000}`,
-            agentCode: Math.random() > 0.7 ? `A${Math.floor(Math.random() * 9000) + 1000}` : undefined,
-            agentName: Math.random() > 0.7 ? 'EXPEDIA TRAVEL' : undefined
-          },
-          displayName: guestName,
+          // Adding reservation details without using 'booker' which is not in the type
           totalAmount: roomType.price * stayDuration,
-          currency: 'USD'
+          currency: 'USD',
+          // We can set a displayName property if it's part of the Reservation type
+          displayName: guestName
         });
         
         id++;

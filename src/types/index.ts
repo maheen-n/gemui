@@ -149,6 +149,8 @@ export interface RoomType {
   description: string;
   capacity: number;
   count: number;
+  price?: number;
+  amenities?: string[];
 }
 
 export interface Reservation {
@@ -162,6 +164,10 @@ export interface Reservation {
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
+  // Add these properties to the Reservation type
+  totalAmount?: number;
+  currency?: string;
+  displayName?: string;
 }
 
 export interface SpaService {
