@@ -10,7 +10,7 @@ export interface Reservation {
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
-  totalAmount?: number;  // Added optional totalAmount
-  currency?: string;     // Added optional currency
-  displayName?: string;  // Added optional displayName
+  totalAmount?: number;  // Ensure this is optional
+  currency?: string;     // Ensure this is optional
+  displayName?: string;  // Ensure this is optional
 }
