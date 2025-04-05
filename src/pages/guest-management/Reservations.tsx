@@ -1,18 +1,14 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { format, addDays, subDays } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { 
   Card, 
   CardContent, 
-  CardHeader, 
-  CardTitle, 
 } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
-  Plane, 
   Search, 
   X, 
   Eye, 
@@ -20,12 +16,10 @@ import {
   HomeIcon,
   Users2,
   DollarSign,
-  Badge as BadgeIcon,
   CalendarClock,
 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
 
 // Use the extended reservation type for our dummy data
 interface ExtendedReservation {
@@ -248,7 +242,7 @@ const Reservations = () => {
   const handleDateChange = (offset: number) => {
     setSelectedDate(currentDate => {
       if (offset === 0) return new Date('2025-03-30'); // Today
-      return offset > 0 ? addDays(currentDate, 1) : subDays(currentDate, 1);
+      return offset > 0 ? addDays(currentDate, 1) : currentDate;
     });
   };
   
@@ -278,32 +272,17 @@ const Reservations = () => {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Arrivals</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
           <p className="text-muted-foreground mt-2">
-            View and manage upcoming guest arrivals
+            View and manage hotel reservations
           </p>
         </div>
 
         <Card className="border-none shadow-md">
           <CardContent className="p-6">
-            {/* Header with Plane icon */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-blue-100 p-2 rounded-full">
-                <Plane className="h-5 w-5 text-blue-600" />
-              </div>
-              <h2 className="text-xl font-semibold">Today's Arrivals</h2>
-            </div>
-
             {/* Date Filter */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div className="flex flex-wrap gap-2">
-                <Button 
-                  variant={format(selectedDate, 'yyyy-MM-dd') === format(subDays(new Date('2025-03-30'), 1), 'yyyy-MM-dd') ? 'default' : 'outline'} 
-                  size="sm"
-                  onClick={() => handleDateChange(-1)}
-                >
-                  Yesterday
-                </Button>
                 <Button 
                   variant={format(selectedDate, 'yyyy-MM-dd') === '2025-03-30' ? 'default' : 'outline'} 
                   size="sm"
@@ -412,12 +391,12 @@ const Reservations = () => {
                   ))
                 ) : (
                   <div className="text-center py-12 bg-muted/20 rounded-lg">
-                    <Plane className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-3" />
-                    <h3 className="text-lg font-medium mb-1">No Arrivals Found</h3>
+                    <HomeIcon className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-3" />
+                    <h3 className="text-lg font-medium mb-1">No Reservations Found</h3>
                     <p className="text-muted-foreground">
                       {searchQuery 
                         ? "Try adjusting your search query" 
-                        : `No arrivals for ${format(selectedDate, 'MMMM d, yyyy')}`}
+                        : `No reservations for ${format(selectedDate, 'MMMM d, yyyy')}`}
                     </p>
                   </div>
                 )}

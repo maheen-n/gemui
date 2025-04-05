@@ -35,7 +35,15 @@ import {
   Utensils,
   Link as LinkIcon,
   ArrowRightCircle,
-  MapPin
+  MapPin,
+  CheckCheck,
+  ClipboardCheck,
+  AlertCircle,
+  RotateCcw,
+  Star,
+  CirclePlus,
+  CircleMinus,
+  FileEdit
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -95,6 +103,17 @@ interface ExtendedReservation {
   propertyCode?: string;
   earliestCheckInTime?: number;
   latestCheckOutTime?: number;
+  activities?: ReservationActivity[];
+}
+
+interface ReservationActivity {
+  id: string;
+  type: 'booking' | 'check-in' | 'check-out' | 'payment' | 'room-change' | 'feedback' | 'note' | 'cancel' | 'modification';
+  timestamp: number;
+  description: string;
+  user?: string;
+  details?: string;
+  roomId?: string;
 }
 
 const guestReservationsData: ExtendedReservation[] = [
@@ -208,7 +227,67 @@ const guestReservationsData: ExtendedReservation[] = [
     displayName: "MICHAEL GROUP",
     propertyCode: "HTLBOM",
     earliestCheckInTime: 1743582600000,
-    latestCheckOutTime: 1743658200000
+    latestCheckOutTime: 1743658200000,
+    activities: [
+      {
+        id: "act-1",
+        type: "booking",
+        timestamp: 1711126800000, // 2025-03-20
+        description: "Reservation Created",
+        user: "Booking System",
+        details: "Reservation #42751-2425 was created with 4 room(s)"
+      },
+      {
+        id: "act-2",
+        type: "payment",
+        timestamp: 1711126800000, // 2025-03-20
+        description: "Payment Received",
+        details: "Payment of 245,280 INR received"
+      },
+      {
+        id: "act-3",
+        type: "modification",
+        timestamp: 1711213200000, // 2025-03-21
+        description: "Reservation Modified",
+        user: "John Smith",
+        details: "Added special request: Late check-out requested"
+      },
+      {
+        id: "act-4",
+        type: "check-in",
+        timestamp: 1743582600000, // 2025-03-30
+        description: "Check-in",
+        user: "Front Desk",
+        details: "Guest checked in to Room 301",
+        roomId: "42751-2425-1"
+      },
+      {
+        id: "act-5",
+        type: "check-in",
+        timestamp: 1743582840000, // 2025-03-30 (a bit later)
+        description: "Check-in",
+        user: "Front Desk",
+        details: "Guest checked in to Room 302",
+        roomId: "42751-2425-2"
+      },
+      {
+        id: "act-6",
+        type: "room-change",
+        timestamp: 1743600000000, // 2025-03-30 (later in the day)
+        description: "Room Change",
+        user: "Front Desk",
+        details: "Room 304 changed to Room 306 due to AC issue",
+        roomId: "42751-2425-4"
+      },
+      {
+        id: "act-7",
+        type: "feedback",
+        timestamp: 1743630000000, // 2025-03-30 (evening)
+        description: "Feedback Added",
+        user: "Guest",
+        details: "Room service was excellent - 5 stars"
+      }
+    ]
   },
   {
     id: "20449-2425",
@@ -270,7 +349,24 @@ const guestReservationsData: ExtendedReservation[] = [
     currency: "USD",
     propertyCode: "HTLDEL",
     earliestCheckInTime: 1743582600000,
-    latestCheckOutTime: 1743917400000
+    latestCheckOutTime: 1743917400000,
+    activities: [
+      {
+        id: "act-1",
+        type: "booking",
+        timestamp: 1711126800000, // 2025-03-20
+        description: "Reservation Created",
+        user: "Booking System",
+        details: "Reservation #20449-2425 was created with 2 room(s)"
+      },
+      {
+        id: "act-2",
+        type: "payment",
+        timestamp: 1711126800000, // 2025-03-20
+        description: "Payment Received",
+        details: "Payment of 20,000 USD received"
+      }
+    ]
   },
   {
     id: "55672-2425",
@@ -400,6 +496,31 @@ const ReservationDetails = () => {
         return <Badge className="bg-amber-500 text-white hover:bg-amber-600">No Show</Badge>;
       default:
         return <Badge>{status}</Badge>;
+    }
+  };
+  
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'booking':
+        return <Calendar className="h-6 w-6 text-blue-500" />;
+      case 'check-in':
+        return <CheckCircle className="h-6 w-6 text-green-500" />;
+      case 'check-out':
+        return <LogOutIcon className="h-6 w-6 text-muted-foreground" />;
+      case 'payment':
+        return <DollarSign className="h-6 w-6 text-green-600" />;
+      case 'room-change':
+        return <RotateCcw className="h-6 w-6 text-amber-500" />;
+      case 'feedback':
+        return <Star className="h-6 w-6 text-yellow-500" />;
+      case 'note':
+        return <FileEdit className="h-6 w-6 text-blue-400" />;
+      case 'cancel':
+        return <CircleMinus className="h-6 w-6 text-red-500" />;
+      case 'modification':
+        return <Pencil className="h-6 w-6 text-purple-500" />;
+      default:
+        return <ClipboardCheck className="h-6 w-6 text-gray-500" />;
     }
   };
   
@@ -648,35 +769,59 @@ const ReservationDetails = () => {
               <TabsContent value="activity" className="mt-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Activity Log</CardTitle>
+                    <CardTitle>Activity Timeline</CardTitle>
                     <CardDescription>
-                      Recent activities for this reservation
+                      Complete history of activities for this reservation
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="border rounded-md p-4">
-                        <div className="flex justify-between mb-2">
-                          <div className="font-medium">Reservation Created</div>
-                          <div className="text-muted-foreground text-sm">
-                            {format(new Date(reservation.createdAt), 'dd MMM yyyy, hh:mm a')}
+                    <div className="relative">
+                      <div className="absolute left-6 top-0 bottom-0 w-px bg-border"></div>
+
+                      <div className="space-y-8 relative">
+                        {reservation.activities && reservation.activities.length > 0 ? (
+                          [...reservation.activities]
+                            .sort((a, b) => b.timestamp - a.timestamp)
+                            .map((activity) => (
+                              <div key={activity.id} className="relative pl-12">
+                                <div className="absolute left-0 top-0 bg-card p-1.5 rounded-full border">
+                                  {getActivityIcon(activity.type)}
+                                </div>
+
+                                <div className="bg-card border rounded-lg p-4">
+                                  <div className="flex justify-between mb-2">
+                                    <div className="font-medium">{activity.description}</div>
+                                    <div className="text-muted-foreground text-sm">
+                                      {formatTimestamp(activity.timestamp)}
+                                    </div>
+                                  </div>
+                                  <div className="text-sm text-muted-foreground mb-2">
+                                    {activity.details}
+                                  </div>
+                                  {activity.user && (
+                                    <div className="text-xs flex items-center">
+                                      <UserCircle className="h-3 w-3 mr-1.5 text-muted-foreground" />
+                                      <span>By: {activity.user}</span>
+                                    </div>
+                                  )}
+                                  {activity.roomId && (
+                                    <div className="text-xs flex items-center mt-1">
+                                      <BedDouble className="h-3 w-3 mr-1.5 text-muted-foreground" />
+                                      <span>Room: {activity.roomId}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-8 text-center">
+                            <ClipboardCheck className="h-10 w-10 text-muted-foreground mb-4" />
+                            <h3 className="text-lg font-medium">No activity records</h3>
+                            <p className="text-muted-foreground mt-1">
+                              Activity records for this reservation will appear here
+                            </p>
                           </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Reservation #{reservation.reservationNumber} was created with {reservation.rooms?.length} room(s)
-                        </div>
-                      </div>
-                      
-                      <div className="border rounded-md p-4">
-                        <div className="flex justify-between mb-2">
-                          <div className="font-medium">Payment Received</div>
-                          <div className="text-muted-foreground text-sm">
-                            {format(new Date(reservation.createdAt), 'dd MMM yyyy, hh:mm a')}
-                          </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Payment of {reservation.totalAmount?.toLocaleString()} {reservation.currency} received
-                        </div>
+                        )}
                       </div>
                     </div>
                   </CardContent>
