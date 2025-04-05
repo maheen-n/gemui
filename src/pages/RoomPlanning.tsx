@@ -64,6 +64,7 @@ const RoomPlanning = () => {
         const roomNumber = Math.random() > 0.5 ? `${100 + Math.floor(Math.random() * 20)}` : undefined;
         const reservationId = `res-${i + 1}`;
         
+        // Type casting to ensure TypeScript recognizes all properties
         const reservation: Reservation = {
           id: reservationId,
           guestName,
@@ -75,7 +76,7 @@ const RoomPlanning = () => {
           roomNumber,
           status: 'confirmed',
           createdAt: format(addDays(checkIn, -10), 'yyyy-MM-dd'),
-          totalAmount: roomType.price ? roomType.price * stayDuration : undefined,
+          totalAmount: roomType.price * stayDuration,
           currency: 'USD',
           displayName: guestName
         };
