@@ -10,7 +10,7 @@ export interface Reservation {
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
-  totalAmount?: number;  // Ensure this is optional
-  currency?: string;     // Ensure this is optional
-  displayName?: string;  // Ensure this is optional
+  totalAmount?: number;  // Added the missing property
+  currency?: string;     // Adding this as it's used with totalAmount
+  displayName?: string;  // Adding this as it might be used in the component
 }
