@@ -70,9 +70,6 @@ export interface Reservation {
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
-  totalAmount: number;  // Make required
-  currency: string;     // Make required
-  displayName: string;  // Make required
 }
 
 // Type alias for Reservation to avoid conflicts in Reservations.tsx
@@ -168,3 +165,4 @@ export interface MiniBarLogItem {
   consumed: number;
   price: number;
 }
+
