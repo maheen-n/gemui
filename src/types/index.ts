@@ -1,3 +1,4 @@
+
 export interface Reservation {
   id: string;
   guestName: string;
@@ -9,9 +10,9 @@ export interface Reservation {
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
-  totalAmount?: number;  // Added this property
-  currency?: string;     // Added this property  
-  displayName?: string;  // Added this property
+  totalAmount?: number;  // Add property
+  currency?: string;     // Add property
+  displayName?: string;  // Add property
 }
 
 // Add missing types related to SpaBooking functionality
