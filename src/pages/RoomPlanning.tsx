@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { format, addDays } from 'date-fns';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -7,6 +8,80 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+
+// Import the same dummy data as in Reservations
+const dummyReservations: Reservation[] = [
+  {
+    id: '1',
+    guestName: 'John Smith',
+    reservationNumber: 'RES10001',
+    pax: 2,
+    checkIn: '2025-04-10T14:00:00',
+    checkOut: '2025-04-13T12:00:00',
+    roomTypeId: '1',
+    status: 'booking',
+    createdAt: '2025-03-15T09:23:00',
+    totalAmount: 15618,
+    currency: 'USD',
+    displayName: 'Executive Room - 3 nights'
+  },
+  {
+    id: '2',
+    guestName: 'Maria Garcia',
+    reservationNumber: 'RES10002',
+    pax: 3,
+    checkIn: '2025-04-10T14:00:00',
+    checkOut: '2025-04-15T12:00:00',
+    roomTypeId: '3',
+    status: 'booking',
+    createdAt: '2025-03-20T14:30:00',
+    totalAmount: 75000,
+    currency: 'USD',
+    displayName: 'Family Suite - 5 nights'
+  },
+  {
+    id: '3',
+    guestName: 'Robert Johnson',
+    reservationNumber: 'RES10003',
+    pax: 1,
+    checkIn: '2025-04-11T14:00:00',
+    checkOut: '2025-04-14T12:00:00',
+    roomTypeId: '2',
+    status: 'booking',
+    createdAt: '2025-03-22T11:15:00',
+    totalAmount: 24000,
+    currency: 'USD',
+    displayName: 'Deluxe Room - 3 nights'
+  },
+  {
+    id: '4',
+    guestName: 'Sarah Williams',
+    reservationNumber: 'RES10004',
+    pax: 2,
+    checkIn: '2025-04-12T14:00:00',
+    checkOut: '2025-04-14T12:00:00',
+    roomTypeId: '4',
+    status: 'booking',
+    createdAt: '2025-03-25T16:45:00',
+    totalAmount: 24000,
+    currency: 'USD',
+    displayName: 'Suite - 2 nights'
+  },
+  {
+    id: '5',
+    guestName: 'Michael Brown',
+    reservationNumber: 'RES10005',
+    pax: 4,
+    checkIn: '2025-04-11T14:00:00',
+    checkOut: '2025-04-18T12:00:00',
+    roomTypeId: '3',
+    status: 'booking',
+    createdAt: '2025-03-28T10:20:00',
+    totalAmount: 105000,
+    currency: 'USD',
+    displayName: 'Family Suite - 7 nights'
+  }
+];
 
 const RoomPlanning = () => {
   const { toast } = useToast();
@@ -56,8 +131,8 @@ const RoomPlanning = () => {
     ];
     
     setRoomTypes(mockRoomTypes);
-    // Removed mock reservations
-    setReservations([]);
+    // Set the dummy reservations
+    setReservations(dummyReservations);
   }, []);
 
   const handleAssignRoom = (reservationId: string, roomNumber: string) => {
@@ -98,7 +173,7 @@ const RoomPlanning = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Room Planning</h1>
-          <Button onClick={handleCreateReservation}>Create Reservation</Button>
+          <Button onClick={handleCreateReservation}>View Reservations</Button>
         </div>
         
         <Card>

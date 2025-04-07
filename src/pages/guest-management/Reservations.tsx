@@ -21,24 +21,81 @@ import {
 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Reservation } from '@/types';
 
-// Use the extended reservation type for our dummy data
-interface ExtendedReservation {
-  id: string;
-  reservationNumber: string;
-  guestName: string;
-  checkIn: string;
-  checkOut: string;
-  serialNumber: string;
-  entityCode: string;
-  roomTypeId: string;
-  pax: number;
-  status: 'booking' | 'checked-in' | 'checked-out' | 'cancelled';
-  createdAt: string;
-}
-
-// Removed guest reservations data
-const guestReservationsData: ExtendedReservation[] = [];
+// Dummy reservation data
+const guestReservationsData: Reservation[] = [
+  {
+    id: '1',
+    guestName: 'John Smith',
+    reservationNumber: 'RES10001',
+    pax: 2,
+    checkIn: '2025-04-10T14:00:00',
+    checkOut: '2025-04-13T12:00:00',
+    roomTypeId: '1',
+    status: 'booking',
+    createdAt: '2025-03-15T09:23:00',
+    totalAmount: 15618,
+    currency: 'USD',
+    displayName: 'Executive Room - 3 nights'
+  },
+  {
+    id: '2',
+    guestName: 'Maria Garcia',
+    reservationNumber: 'RES10002',
+    pax: 3,
+    checkIn: '2025-04-10T14:00:00',
+    checkOut: '2025-04-15T12:00:00',
+    roomTypeId: '3',
+    status: 'booking',
+    createdAt: '2025-03-20T14:30:00',
+    totalAmount: 75000,
+    currency: 'USD',
+    displayName: 'Family Suite - 5 nights'
+  },
+  {
+    id: '3',
+    guestName: 'Robert Johnson',
+    reservationNumber: 'RES10003',
+    pax: 1,
+    checkIn: '2025-04-11T14:00:00',
+    checkOut: '2025-04-14T12:00:00',
+    roomTypeId: '2',
+    status: 'booking',
+    createdAt: '2025-03-22T11:15:00',
+    totalAmount: 24000,
+    currency: 'USD',
+    displayName: 'Deluxe Room - 3 nights'
+  },
+  {
+    id: '4',
+    guestName: 'Sarah Williams',
+    reservationNumber: 'RES10004',
+    pax: 2,
+    checkIn: '2025-04-12T14:00:00',
+    checkOut: '2025-04-14T12:00:00',
+    roomTypeId: '4',
+    status: 'booking',
+    createdAt: '2025-03-25T16:45:00',
+    totalAmount: 24000,
+    currency: 'USD',
+    displayName: 'Suite - 2 nights'
+  },
+  {
+    id: '5',
+    guestName: 'Michael Brown',
+    reservationNumber: 'RES10005',
+    pax: 4,
+    checkIn: '2025-04-11T14:00:00',
+    checkOut: '2025-04-18T12:00:00',
+    roomTypeId: '3',
+    status: 'booking',
+    createdAt: '2025-03-28T10:20:00',
+    totalAmount: 105000,
+    currency: 'USD',
+    displayName: 'Family Suite - 7 nights'
+  }
+];
 
 const Reservations = () => {
   const navigate = useNavigate();
@@ -68,12 +125,16 @@ const Reservations = () => {
   const handleDateChange = (offset: number) => {
     setSelectedDate(currentDate => {
       if (offset === 0) return new Date(); // Today
-      return offset > 0 ? addDays(currentDate, 1) : currentDate;
+      return addDays(currentDate, offset);
     });
   };
   
   const viewReservationDetails = (reservationId: string) => {
     navigate(`/guest-management/reservation-details/${reservationId}`);
+  };
+  
+  const navigateToRoomPlanning = () => {
+    navigate('/room-planning');
   };
   
   const getStatusBadge = (status: string) => {
@@ -97,11 +158,16 @@ const Reservations = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
-          <p className="text-muted-foreground mt-2">
-            View and manage hotel reservations
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
+            <p className="text-muted-foreground mt-2">
+              View and manage hotel reservations
+            </p>
+          </div>
+          <Button onClick={navigateToRoomPlanning}>
+            View Room Planning
+          </Button>
         </div>
 
         <Card className="border-none shadow-md">
@@ -154,13 +220,40 @@ const Reservations = () => {
                 {getFilteredGuests().length > 0 ? (
                   getFilteredGuests().map((reservation) => (
                     <Card key={reservation.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                      {/* Placeholder for when reservations are added */}
-                      <div className="text-center py-12 bg-muted/20 rounded-lg">
-                        <HomeIcon className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-3" />
-                        <h3 className="text-lg font-medium mb-1">No Reservations</h3>
-                        <p className="text-muted-foreground">
-                          No reservations found. Create a new reservation to get started.
-                        </p>
+                      <div className="flex flex-col md:flex-row md:items-center p-4 cursor-pointer" 
+                           onClick={() => viewReservationDetails(reservation.id)}>
+                        <div className="flex-1 mb-3 md:mb-0">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between">
+                            <div>
+                              <h3 className="text-lg font-medium">{reservation.guestName}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {reservation.reservationNumber} • {reservation.displayName}
+                              </p>
+                            </div>
+                            <div className="mt-2 md:mt-0">
+                              {getStatusBadge(reservation.status)}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 text-sm">
+                          <div className="flex items-center">
+                            <Users2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{reservation.pax} guests</span>
+                          </div>
+                          <div className="flex items-center">
+                            <CalendarClock className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{format(new Date(reservation.checkIn), 'MMM d')} - {format(new Date(reservation.checkOut), 'MMM d')}</span>
+                          </div>
+                          <div className="flex items-center col-span-2 md:col-span-1">
+                            <HomeIcon className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{reservation.displayName.split(' - ')[0]}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: reservation.currency || 'USD' }).format(reservation.totalAmount || 0)}</span>
+                          </div>
+                        </div>
                       </div>
                     </Card>
                   ))
@@ -185,4 +278,3 @@ const Reservations = () => {
 };
 
 export default Reservations;
-
