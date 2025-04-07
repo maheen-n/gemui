@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -18,34 +19,19 @@ import {
   DollarSign,
   CalendarClock,
 } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Reservation } from '@/types';
 import { mockReservations } from '@/data/mockReservations';
+import { filterReservations, getStatusBadge } from '@/utils/reservationUtils';
 
 const Reservations = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Filter reservations to only show arrivals (booking status)
+  // Get filtered reservations using the utility function
   const getFilteredGuests = () => {
-    let filtered = mockReservations.filter(guest => guest.status === 'booking');
-    
-    // Apply date filter
-    filtered = filtered.filter(guest => 
-      format(new Date(guest.checkIn), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
-    );
-
-    // Apply search filter if query exists
-    if (searchQuery) {
-      filtered = filtered.filter(guest =>
-        guest.guestName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        guest.reservationNumber.includes(searchQuery)
-      );
-    }
-
-    return filtered;
+    return filterReservations(mockReservations, 'booking', selectedDate, searchQuery);
   };
 
   const handleDateChange = (offset: number) => {
@@ -61,24 +47,6 @@ const Reservations = () => {
   
   const navigateToRoomPlanning = () => {
     navigate('/room-planning');
-  };
-  
-  const getStatusBadge = (status: string) => {
-    switch(status.toLowerCase()) {
-      case 'confirmed':
-      case 'booking':
-        return <Badge className="bg-blue-500 text-white hover:bg-blue-600">Booking</Badge>;
-      case 'checked-in':
-        return <Badge className="bg-green-500 text-white hover:bg-green-600">Checked In</Badge>;
-      case 'checked-out':
-        return <Badge variant="outline">Checked Out</Badge>;
-      case 'cancelled':
-        return <Badge className="bg-red-500 text-white hover:bg-red-600">Cancelled</Badge>;
-      case 'no-show':
-        return <Badge className="bg-amber-500 text-white hover:bg-amber-600">No Show</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
-    }
   };
 
   return (
