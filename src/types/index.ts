@@ -1,4 +1,3 @@
-
 export interface Reservation {
   id: string;
   guestName: string;
@@ -10,7 +9,17 @@ export interface Reservation {
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
-  totalAmount?: number;  // Ensure this is optional
-  currency?: string;     // Ensure this is optional
-  displayName?: string;  // Ensure this is optional
+  totalAmount: number;
+  currency: string;
+  displayName: string;
+}
+
+export interface RoomType {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  capacity: number;
+  amenities: string[];
+  count: number;
 }
