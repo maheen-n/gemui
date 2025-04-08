@@ -25,7 +25,7 @@ export interface RoomType {
   count: number;
 }
 
-// New types for inventory tracking
+// Types for inventory tracking
 export interface InventoryTransaction {
   id: string;
   staffId: string;
