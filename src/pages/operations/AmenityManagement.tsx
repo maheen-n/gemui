@@ -1,14 +1,9 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AmenityConfiguration } from '@/components/housekeeping/AmenityConfiguration';
-import { AmenityTracker } from '@/components/housekeeping/AmenityTracker';
-import { AmenityLogViewer } from '@/components/housekeeping/AmenityLogViewer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ClipboardList, Settings, ArrowLeft, BarChart3 } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 
 const AmenityManagement = () => {
   return (
@@ -17,9 +12,8 @@ const AmenityManagement = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Amenity Management</h1>
-            <p className="text-muted-foreground">Track amenity usage and manage housekeeping operations</p>
+            <p className="text-muted-foreground">Configure and manage housekeeping amenities</p>
           </div>
-          {/* Add Report button */}
           <div className="flex gap-2">
             <Button variant="outline" asChild>
               <Link to="/operations/housekeeping/amenity/report">
@@ -30,25 +24,7 @@ const AmenityManagement = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="tracker" className="space-y-4">
-          <TabsList className="grid grid-cols-3 w-full max-w-xl">
-            <TabsTrigger value="tracker">Amenity Tracker</TabsTrigger>
-            <TabsTrigger value="logs">Amenity Logs</TabsTrigger>
-            <TabsTrigger value="configuration">Configuration</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="tracker">
-            <AmenityTracker />
-          </TabsContent>
-
-          <TabsContent value="logs">
-            <AmenityLogViewer />
-          </TabsContent>
-
-          <TabsContent value="configuration">
-            <AmenityConfiguration />
-          </TabsContent>
-        </Tabs>
+        <AmenityConfiguration />
       </div>
     </DashboardLayout>
   );

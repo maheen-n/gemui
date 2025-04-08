@@ -100,35 +100,23 @@ export interface Amenity {
   image?: string;
 }
 
-export interface RoomAmenityConfig {
-  roomTypeId: string;
-  amenityId: string;
-  count: number;
-}
-
-export interface CleaningType {
+// Types for Amenity Inventory Report
+export interface InventoryTransaction {
   id: string;
-  name: string;
-  description: string;
-  amenityMultiplier: number;
-  estimatedDuration: number;
-}
-
-export interface AmenityLog {
-  id: string;
-  roomId: string;
-  roomNumber: string;
   staffId: string;
   staffName: string;
   date: string;
-  cleaningTypeId: string;
-  amenities: AmenityLogItem[];
+  roomId: string;
+  roomNumber: string;
+  transactionType: 'taken' | 'returned';
+  items: InventoryTransactionItem[];
 }
 
-export interface AmenityLogItem {
+export interface InventoryTransactionItem {
   amenityId: string;
   amenityName: string;
   count: number;
+  category: string;
 }
 
 // New types for MiniBar Management
@@ -164,23 +152,4 @@ export interface MiniBarLogItem {
   itemName: string;
   consumed: number;
   price: number;
-}
-
-// Types for Amenity Inventory Report
-export interface InventoryTransaction {
-  id: string;
-  staffId: string;
-  staffName: string;
-  date: string;
-  roomId: string;
-  roomNumber: string;
-  transactionType: 'taken' | 'returned';
-  items: InventoryTransactionItem[];
-}
-
-export interface InventoryTransactionItem {
-  amenityId: string;
-  amenityName: string;
-  count: number;
-  category: string;
 }
