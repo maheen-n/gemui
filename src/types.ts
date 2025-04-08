@@ -166,3 +166,21 @@ export interface MiniBarLogItem {
   price: number;
 }
 
+// Types for Amenity Inventory Report
+export interface InventoryTransaction {
+  id: string;
+  staffId: string;
+  staffName: string;
+  date: string;
+  roomId: string;
+  roomNumber: string;
+  transactionType: 'taken' | 'returned';
+  items: InventoryTransactionItem[];
+}
+
+export interface InventoryTransactionItem {
+  amenityId: string;
+  amenityName: string;
+  count: number;
+  category: string;
+}

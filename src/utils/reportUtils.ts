@@ -1,4 +1,3 @@
-
 import { InventoryTransaction, Amenity } from '@/types';
 import { format, parseISO, isWithinInterval, subDays } from 'date-fns';
 
@@ -87,6 +86,61 @@ export const mockInventoryTransactions: InventoryTransaction[] = [
     items: [
       { amenityId: '7', amenityName: 'Bathrobe', count: 1, category: 'Comfort' },
       { amenityId: '9', amenityName: 'Coffee Pods', count: 2, category: 'Beverage' }
+    ]
+  },
+  {
+    id: '7',
+    staffId: 'staff4',
+    staffName: 'David Kim',
+    date: new Date(2025, 3, 8, 8, 0).toISOString(),
+    roomId: '401',
+    roomNumber: '401',
+    transactionType: 'taken',
+    items: [
+      { amenityId: '10', amenityName: 'Tea Bags', count: 10, category: 'Beverage' },
+      { amenityId: '11', amenityName: 'Dental Kit', count: 4, category: 'Personal Care' },
+      { amenityId: '12', amenityName: 'Shower Cap', count: 4, category: 'Bath' }
+    ]
+  },
+  {
+    id: '8',
+    staffId: 'staff4',
+    staffName: 'David Kim',
+    date: new Date(2025, 3, 8, 11, 30).toISOString(),
+    roomId: '402',
+    roomNumber: '402',
+    transactionType: 'taken',
+    items: [
+      { amenityId: '1', amenityName: 'Shampoo', count: 6, category: 'Bath' },
+      { amenityId: '2', amenityName: 'Conditioner', count: 6, category: 'Bath' },
+      { amenityId: '13', amenityName: 'Hand Cream', count: 3, category: 'Personal Care' }
+    ]
+  },
+  {
+    id: '9',
+    staffId: 'staff5',
+    staffName: 'Emily Brown',
+    date: new Date(2025, 3, 8, 9, 15).toISOString(),
+    roomId: '501',
+    roomNumber: '501',
+    transactionType: 'taken',
+    items: [
+      { amenityId: '14', amenityName: 'Sewing Kit', count: 2, category: 'Personal Care' },
+      { amenityId: '15', amenityName: 'Shoe Polish Kit', count: 2, category: 'Personal Care' },
+      { amenityId: '16', amenityName: 'Writing Kit', count: 2, category: 'Stationery' }
+    ]
+  },
+  {
+    id: '10',
+    staffId: 'staff5',
+    staffName: 'Emily Brown',
+    date: new Date(2025, 3, 8, 15, 45).toISOString(),
+    roomId: '501',
+    roomNumber: '501',
+    transactionType: 'returned',
+    items: [
+      { amenityId: '14', amenityName: 'Sewing Kit', count: 1, category: 'Personal Care' },
+      { amenityId: '15', amenityName: 'Shoe Polish Kit', count: 1, category: 'Personal Care' }
     ]
   }
 ];
