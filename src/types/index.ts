@@ -1,4 +1,5 @@
 
+
 export interface Reservation {
   id: string;
   guestName: string;
@@ -10,8 +11,6 @@ export interface Reservation {
   roomNumber?: string;
   status: 'pending' | 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'booking';
   createdAt: string;
-  totalAmount: number;
-  currency: string;
   displayName: string;
 }
 
@@ -43,3 +42,4 @@ export interface InventoryTransactionItem {
   count: number;
   category: string;
 }
+

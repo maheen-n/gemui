@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { format, addDays, differenceInDays } from 'date-fns';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -78,10 +79,16 @@ const RoomPlanning = () => {
           Check-in: ${format(new Date(reservation.checkIn), 'dd MMM yyyy')}
           Check-out: ${format(new Date(reservation.checkOut), 'dd MMM yyyy')}
           Pax: ${reservation.pax}
-          Amount: ${reservation.currency} ${reservation.totalAmount}
+          Amount: ${getRoomPrice(reservation.roomTypeId)} INR
         `,
       });
     }
+  };
+  
+  // Helper function to get room price based on room type ID
+  const getRoomPrice = (roomTypeId: string): number => {
+    const roomType = roomTypes.find(rt => rt.id === roomTypeId);
+    return roomType ? roomType.price : 0;
   };
 
   return (

@@ -1,3 +1,4 @@
+
 import { Reservation } from '@/types';
 
 // Generate 200 reservations (100 for April 2025, 100 for May 2025)
@@ -20,17 +21,6 @@ const generateMockReservations = (): Reservation[] => {
   const getRandomDate = (month: number) => {
     const day = Math.floor(Math.random() * 28) + 1; // 1-28 to avoid month overflow
     return `2025-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-  };
-
-  // Function to get room price based on room type
-  const getRoomPrice = (roomTypeId: string): number => {
-    switch (roomTypeId) {
-      case '1': return 5206;  // Executive Room
-      case '2': return 8000;  // Deluxe Room
-      case '3': return 15000; // Family Suite
-      case '4': return 12000; // Suite
-      default: return 5000;
-    }
   };
 
   // Generate April reservations
@@ -59,8 +49,6 @@ const generateMockReservations = (): Reservation[] => {
       roomTypeId,
       status: statuses[Math.floor(Math.random() * statuses.length)],
       createdAt: '2025-03-15',
-      totalAmount: getRoomPrice(roomTypeId) * stayDuration,
-      currency: 'INR',
       displayName: `${lastName} FAMILY`
     });
   }
@@ -91,8 +79,6 @@ const generateMockReservations = (): Reservation[] => {
       roomTypeId,
       status: statuses[Math.floor(Math.random() * statuses.length)],
       createdAt: '2025-04-01',
-      totalAmount: getRoomPrice(roomTypeId) * stayDuration,
-      currency: 'INR',
       displayName: `${lastName} FAMILY`
     });
   }
