@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,6 +27,7 @@ import SpaBooking from "./pages/guest-management/SpaBooking";
 
 // Operations pages
 import AmenityManagement from "./pages/operations/AmenityManagement";
+import AmenityReport from "./pages/operations/AmenityReport";
 import MiniBarManagement from "./pages/operations/MiniBarManagement";
 
 // Create a client
@@ -58,6 +60,7 @@ function App() {
             <Route path="/work-orders" element={<WorkOrders />} />
             <Route path="/lost-found" element={<LostFound />} />
             <Route path="/operations/housekeeping/amenity" element={<AmenityManagement />} />
+            <Route path="/operations/housekeeping/amenity/report" element={<AmenityReport />} />
             <Route path="/operations/housekeeping/minibar" element={<MiniBarManagement />} />
             
             {/* Other routes */}

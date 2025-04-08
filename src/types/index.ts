@@ -1,3 +1,4 @@
+
 export interface Reservation {
   id: string;
   guestName: string;
@@ -22,4 +23,23 @@ export interface RoomType {
   capacity: number;
   amenities: string[];
   count: number;
+}
+
+// New types for inventory tracking
+export interface InventoryTransaction {
+  id: string;
+  staffId: string;
+  staffName: string;
+  date: string;
+  roomId?: string;
+  roomNumber?: string;
+  transactionType: 'taken' | 'returned';
+  items: InventoryTransactionItem[];
+}
+
+export interface InventoryTransactionItem {
+  amenityId: string;
+  amenityName: string;
+  count: number;
+  category: string;
 }

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,7 @@ import { AmenityTracker } from '@/components/housekeeping/AmenityTracker';
 import { AmenityLogViewer } from '@/components/housekeeping/AmenityLogViewer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ClipboardList, Settings, ArrowLeft } from 'lucide-react';
+import { ClipboardList, Settings, ArrowLeft, BarChart3 } from 'lucide-react';
 
 const AmenityManagement = () => {
   return (
@@ -18,21 +19,15 @@ const AmenityManagement = () => {
             <h1 className="text-2xl font-bold tracking-tight">Amenity Management</h1>
             <p className="text-muted-foreground">Track amenity usage and manage housekeeping operations</p>
           </div>
-          {/* Remove the Back and Settings buttons */}
-          {/* 
+          {/* Add Report button */}
           <div className="flex gap-2">
             <Button variant="outline" asChild>
-              <Link to="/operations/housekeeping">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Housekeeping
+              <Link to="/operations/housekeeping/amenity/report">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Inventory Reports
               </Link>
             </Button>
-            <Button variant="outline">
-              <Settings className="mr-2 h-4 w-4" />
-              Amenity Settings
-            </Button>
           </div>
-          */}
         </div>
 
         <Tabs defaultValue="tracker" className="space-y-4">
